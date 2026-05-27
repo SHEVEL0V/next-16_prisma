@@ -1,16 +1,8 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Paper, Stack, TextField, Typography } from "@mui/material";
 import { useActionState } from "react";
 import { updateProfileAction } from "../actions";
-
 
 interface ProfileFormProps {
   user: {
@@ -24,8 +16,6 @@ interface ProfileFormProps {
     };
   };
 }
-
-
 
 export default function ProfileForm({ user }: ProfileFormProps) {
   const [state, action, isPending] = useActionState(updateProfileAction, {
@@ -42,7 +32,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       sx={{ p: { xs: 2, md: 4 }, maxWidth: 700, mx: "auto", borderRadius: 3 }}
     >
       <Typography variant="h5" sx={{ mb: 3, fontWeight: "bold" }}>
-        Налаштування профілю
+        Profile Settings
       </Typography>
 
       {state.message && state.success && (
@@ -66,11 +56,11 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             defaultValue={user.email}
             disabled
             fullWidth
-            helperText="Email змінити не можна."
+            helperText="Email cannot be changed."
           />
 
           <TextField
-            label="Ім'я"
+            label="Name"
             name="name"
             defaultValue={user.name}
             fullWidth
@@ -79,7 +69,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           />
 
           <TextField
-            label="Посада"
+            label="Position"
             name="position"
             defaultValue={user.profile?.position || ""}
             fullWidth
@@ -88,7 +78,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           />
 
           <TextField
-            label="Аватар (URL зображення)"
+            label="Avatar (Image URL)"
             name="image"
             defaultValue={user.profile?.image || ""}
             fullWidth
@@ -97,7 +87,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           />
 
           <TextField
-            label="Про себе / Біографія"
+            label="About Me / Biography"
             name="bio"
             defaultValue={user.profile?.bio || ""}
             multiline
@@ -114,7 +104,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             disabled={isPending}
             sx={{ alignSelf: "flex-start", px: 4, py: 1.5 }}
           >
-            {isPending ? "Збереження..." : "Зберегти зміни"}
+            {isPending ? "Saving..." : "Save changes"}
           </Button>
         </Stack>
       </Box>

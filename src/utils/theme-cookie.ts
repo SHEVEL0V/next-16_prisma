@@ -10,7 +10,7 @@ function getCookieOptions() {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 365, // 1 рік
+    maxAge: 60 * 60 * 24 * 365, // 1 year
     path: "/",
   } as const;
 }

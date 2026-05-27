@@ -45,7 +45,7 @@ export default function Sidebar({ boards, activeBoard }: SidebarProps) {
       >
         {isOpen && (
           <Typography id="board-title" variant="h6" sx={{ fontWeight: "bold" }}>
-            Дошки
+            Boards
           </Typography>
         )}
         <IconButton onClick={toggleSidebar}>{isOpen ? <MenuOpenIcon /> : <MenuIcon />}</IconButton>

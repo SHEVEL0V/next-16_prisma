@@ -3,7 +3,7 @@
 /**
  * Authentication Validation Schemas
  * Zod schemas for login and registration
- * Provides client-side and server-side validation with Ukrainian error messages
+ * Provides client-side and server-side validation with English error messages
  */
 
 import { z } from "zod";
@@ -18,28 +18,26 @@ export interface RegisterInputT extends RegisterInput {
  * Name validation
  * Minimum 4 characters, whitespace trimmed
  */
-const name = z.string().trim().min(4, "Ім'я занадто коротке");
+const name = z.string().trim().min(4, "Name is too short");
 
 /**
  * Email validation
  * Must be valid email format
  */
-const email = z.email("Некоректний формат email").min(1, "Email обов'язковий");
+const email = z.email("Invalid email format").min(1, "Email is required");
 
 /**
  * Password validation
  * Minimum 6 characters for basic security
  * In production, consider 12+ characters and complexity requirements
  */
-const password = z.string().min(6, "Пароль має бути не менше 6 символів");
+const password = z.string().min(6, "Password must be at least 6 characters");
 
 /**
  * Password confirmation field
  * Used to verify password match during registration
  */
-const confirmPassword = z
-  .string()
-  .min(6, "Пароль має бути не менше 6 символів");
+const confirmPassword = z.string().min(6, "Password must be at least 6 characters");
 
 /**
  * Login schema
@@ -64,6 +62,6 @@ export const registerSchema: z.ZodType<RegisterInput> = z
     confirmPassword,
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Паролі не збігаються",
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });

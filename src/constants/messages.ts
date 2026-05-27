@@ -4,79 +4,79 @@
  */
 
 export const MESSAGES = {
-	// Common actions
-	save: 'Зберегти',
-	cancel: 'Скасувати',
-	delete: 'Видалити',
-	edit: 'Редагувати',
-	add: 'Додати',
-	close: 'Закрити',
-	back: 'Назад',
-	next: 'Далі',
-	previous: 'Попередній',
-	submit: 'Відправити',
+  // Common actions
+  save: "Save",
+  cancel: "Cancel",
+  delete: "Delete",
+  edit: "Edit",
+  add: "Add",
+  close: "Close",
+  back: "Back",
+  next: "Next",
+  previous: "Previous",
+  submit: "Submit",
 
-	// Loading states
-	loading: 'Завантаження...',
-	saving: 'Збереження...',
-	deleting: 'Видалення...',
-	updating: 'Оновлення...',
+  // Loading states
+  loading: "Loading...",
+  saving: "Saving...",
+  deleting: "Deleting...",
+  updating: "Updating...",
 
-	// States
-	success: 'Успішно!',
-	error: 'Помилка!',
-	warning: 'Попередження!',
-	info: 'Інформація',
+  // States
+  success: "Success!",
+  error: "Error!",
+  warning: "Warning!",
+  info: "Information",
 
-	// Form messages
-	fillRequiredFields: 'Будь ласка, заповніть обов\'язкові поля',
-	invalidEmail: 'Невалідна електронна пошта',
-	passwordTooShort: 'Пароль занадто короткий',
-	passwordMismatch: 'Паролі не збігаються',
+  // Form messages
+  fillRequiredFields: "Please fill in required fields",
+  invalidEmail: "Invalid email address",
+  passwordTooShort: "Password is too short",
+  passwordMismatch: "Passwords do not match",
 
-	// Dialog titles
-	confirmDelete: 'Підтвердити видалення',
-	editItem: 'Редагувати',
-	createItem: 'Створити',
-	settings: 'Налаштування',
+  // Dialog titles
+  confirmDelete: "Confirm deletion",
+  editItem: "Edit",
+  createItem: "Create",
+  settings: "Settings",
 
-	// Tooltips
-	addNew: 'Додати новий елемент',
-	goBack: 'Повернутися назад',
-	toggleTheme: 'Перемкнути тему',
-	toggleMenu: 'Розкрити меню',
-	userSettings: 'Налаштування користувача',
+  // Tooltips
+  addNew: "Add new item",
+  goBack: "Go back",
+  toggleTheme: "Toggle theme",
+  toggleMenu: "Toggle menu",
+  userSettings: "User settings",
 
-	// Notifications
-	savedSuccessfully: 'Успішно збережено',
-	deletedSuccessfully: 'Успішно видалено',
-	updatedSuccessfully: 'Успішно оновлено',
-	operationFailed: 'Операція не вдалася',
+  // Notifications
+  savedSuccessfully: "Saved successfully",
+  deletedSuccessfully: "Deleted successfully",
+  updatedSuccessfully: "Updated successfully",
+  operationFailed: "Operation failed",
 
-	// Validation
-	required: 'Обов\'язкове поле',
-	minLength: 'Мінімальна довжина',
-	maxLength: 'Максимальна довжина',
+  // Validation
+  required: "Required field",
+  minLength: "Minimum length",
+  maxLength: "Maximum length",
 
-	// Auth
-	loginTitle: 'Вхід',
-	registerTitle: 'Реєстрація',
-	logout: 'Вихід',
-	login: 'Увійти',
-	register: 'Зареєструватися',
+  // Auth
+  loginTitle: "Sign In",
+  registerTitle: "Sign Up",
+  logout: "Sign Out",
+  login: "Log In",
+  register: "Register",
 
-	// Board
-	createBoard: 'Створити дошку',
-	editBoard: 'Редагувати дошку',
-	deleteBoard: 'Видалити дошку',
-	newColumn: 'Нова колона',
-	newTask: 'Нове завдання',
-	taskDetails: 'Деталі завдання',
+  // Board
+  createBoard: "Create board",
+  editBoard: "Edit board",
+  deleteBoard: "Delete board",
+  newColumn: "New column",
+  newTask: "New task",
+  taskDetails: "Task details",
 
-	// Empty states
-	noItems: 'Немає елементів',
-	emptyBoard: 'Дошка пуста',
-	startCreating: 'Почніть створювати',
+  // Empty states
+  noItems: "No items",
+  emptyBoard: "Empty board",
+  startCreating: "Start creating",
 } as const;
 
 /**
@@ -88,5 +88,5 @@ export type MessageKey = keyof typeof MESSAGES;
  * Get message by key with type safety
  */
 export function getMessage(key: MessageKey): string {
-	return MESSAGES[key];
+  return MESSAGES[key];
 }

@@ -7,7 +7,7 @@ import ProfileForm from "@/features/user/components/profile-form";
 import { Container } from "@mui/material";
 
 export const metadata = {
-  title: "Профіль | Project UI",
+  title: "Profile | Project UI",
 };
 
 export default async function ProfilePage() {

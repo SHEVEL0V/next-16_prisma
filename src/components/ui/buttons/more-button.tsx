@@ -73,14 +73,14 @@ export default function MoreButton({
           <ListItemIcon>
             <EditOutlinedIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Редагувати</ListItemText>
+          <ListItemText>Edit</ListItemText>
         </MenuItem>
 
         <MenuItem onClick={handleDelete} disabled={isPending} color="error">
           <ListItemIcon>
             <DeleteOutlineIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>Видалити</ListItemText>
+          <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
     </>

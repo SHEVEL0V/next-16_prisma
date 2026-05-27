@@ -3,7 +3,7 @@
 /**
  * Board Feature Validation Schemas
  * Zod schemas for all board-related operations
- * Provides type-safe validation and Ukrainian error messages
+ * Provides type-safe validation and English error messages
  */
 
 import z from "zod";
@@ -13,8 +13,8 @@ import z from "zod";
  * Used when creating new boards
  */
 export const boardSchema = z.object({
-	title: z.string().min(1, "Назва обов'язкова").max(50),
-	description: z.string().max(255).optional(),
+  title: z.string().min(1, "Title is required").max(50),
+  description: z.string().max(255).optional(),
 });
 
 /**
@@ -22,8 +22,8 @@ export const boardSchema = z.object({
  * Requires parent board ID and column title
  */
 export const columnSchema = z.object({
-	title: z.string().min(1, "Назва обов'язкова"),
-	boardId: z.uuid(),
+  title: z.string().min(1, "Title is required"),
+  boardId: z.uuid(),
 });
 
 /**
@@ -31,8 +31,8 @@ export const columnSchema = z.object({
  * For inline column title editing
  */
 export const updateColumnTitleSchema = z.object({
-	id: z.uuid(),
-	title: z.string().min(1, "Завдання не може бути порожнім"),
+  id: z.uuid(),
+  title: z.string().min(1, "Task cannot be empty"),
 });
 
 /**
@@ -41,10 +41,10 @@ export const updateColumnTitleSchema = z.object({
  * columnId is required when type is "task"
  */
 export const reorderSchema = z.object({
-	id: z.uuid(),
-	type: z.enum(["column", "task"]),
-	order: z.string(),
-	columnId: z.uuid().optional(),
+  id: z.uuid(),
+  type: z.enum(["column", "task"]),
+  order: z.string(),
+  columnId: z.uuid().optional(),
 });
 
 /**
@@ -52,9 +52,9 @@ export const reorderSchema = z.object({
  * Requires title and parent column ID
  */
 export const createTaskSchema = z.object({
-	title: z.string().min(1, "Завдання не може бути порожнім"),
-	columnId: z.uuid(),
-	boardId: z.uuid().optional(),
+  title: z.string().min(1, "Task cannot be empty"),
+  columnId: z.uuid(),
+  boardId: z.uuid().optional(),
 });
 
 /**
@@ -62,8 +62,8 @@ export const createTaskSchema = z.object({
  * For quick title editing
  */
 export const updateTaskSchema = z.object({
-	id: z.uuid(),
-	title: z.string().min(1, "Завдання не може бути порожнім"),
+  id: z.uuid(),
+  title: z.string().min(1, "Task cannot be empty"),
 });
 
 /**
@@ -71,8 +71,8 @@ export const updateTaskSchema = z.object({
  * Priority can be LOW, MEDIUM, HIGH, or URGENT
  */
 export const updateTaskPrioritySchema = z.object({
-	id: z.uuid(),
-	priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
+  id: z.uuid(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
 });
 
 /**
@@ -80,9 +80,9 @@ export const updateTaskPrioritySchema = z.object({
  * Comprehensive task editing including title and description
  */
 export const updateTaskDetailsSchema = z.object({
-	id: z.uuid(),
-	title: z.string().min(1, "Назва обов'язкова").max(100),
-	description: z.string().max(1000).optional(),
+  id: z.uuid(),
+  title: z.string().min(1, "Title is required").max(100),
+  description: z.string().max(1000).optional(),
 });
 
 /**
@@ -90,8 +90,8 @@ export const updateTaskDetailsSchema = z.object({
  * For board title modifications
  */
 export const updateBoardSchema = z.object({
-	id: z.uuid(),
-	title: z.string().min(1, "Назва обов'язкова"),
+  id: z.uuid(),
+  title: z.string().min(1, "Title is required"),
 });
 
 /**

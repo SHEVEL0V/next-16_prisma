@@ -112,8 +112,8 @@ export default function SidebarItem({ id, title, isActive, isOpen }: SidebarItem
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmDelete}
-        title="Видалити дошку"
-        description={`Ви впевнені, що хочете видалити дошку "${title}"? Цю дію неможливо буде скасувати.`}
+        title="Delete board"
+        description={`Are you sure you want to delete the board "${title}"? This action cannot be undone.`}
         state={deleteState}
         isPending={isPendingDelete}
       />

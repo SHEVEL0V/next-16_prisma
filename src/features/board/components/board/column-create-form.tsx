@@ -13,13 +13,7 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
-import {
-  startTransition,
-  useActionState,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { createColumnAction } from "../../actions";
 
 interface ColumnCreateFormProps {
@@ -53,7 +47,7 @@ export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
 
   return (
     <>
-      <Tooltip title="Додати нову колонку" placement="top" arrow>
+      <Tooltip title="Add new column" placement="top" arrow>
         <Box
           sx={{
             display: "flex",
@@ -76,20 +70,15 @@ export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
         </Box>
       </Tooltip>
 
-      <Dialog
-        open={isOpen}
-        onClose={() => !isPending && setIsOpen(false)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle sx={{ pb: 1 }}>Створити нову колонку</DialogTitle>
+      <Dialog open={isOpen} onClose={() => !isPending && setIsOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ pb: 1 }}>Create new column</DialogTitle>
         <form action={actionCreate} ref={formRef}>
           <DialogContent sx={{ pb: 2 }}>
             <input type="hidden" name="boardId" value={boardId} />
             <TextField
               name="title"
-              label="Назва колонки"
-              placeholder="Введіть назву колонки..."
+              label="Column name"
+              placeholder="Enter column name..."
               fullWidth
               size="medium"
               disabled={isPending}
@@ -105,7 +94,7 @@ export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
               color="inherit"
               sx={{ borderRadius: 2 }}
             >
-              Скасувати
+              Cancel
             </Button>
             <Button
               type="submit"
@@ -114,7 +103,7 @@ export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
               color="primary"
               sx={{ borderRadius: 2 }}
             >
-              Створити
+              Create
             </Button>
           </DialogActions>
         </form>

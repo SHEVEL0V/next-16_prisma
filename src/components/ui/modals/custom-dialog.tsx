@@ -26,8 +26,8 @@ interface CustomDialogProps {
 
 export default function CustomDialog({
   onConfirm,
-  title = "Підтвердіть дію",
-  description = "Ви впевнені, що хочете виконати цю дію? Цю дію неможливо буде скасувати.",
+  title = "Confirm action",
+  description = "Are you sure you want to perform this action? This action cannot be undone.",
   state,
   isPending = false,
   open,
@@ -46,7 +46,7 @@ export default function CustomDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={isPending} variant="outlined" color="inherit">
-          Скасувати
+          Cancel
         </Button>
         <Button
           onClick={onConfirm}
@@ -56,7 +56,7 @@ export default function CustomDialog({
           autoFocus
           startIcon={isPending ? <CircularProgress size={14} color="inherit" /> : undefined}
         >
-          {isPending ? "Видалення..." : "Видалити"}
+          {isPending ? "Deleting..." : "Delete"}
         </Button>
       </DialogActions>
     </Dialog>

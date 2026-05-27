@@ -101,7 +101,7 @@ export default function TitleColumn({ id, title, taskCount = 0 }: BoardColumnPro
           }}
         >
           <Tooltip
-            title={hasTasks ? "Очистіть колонку від завдань, щоб видалити" : "Видалити колонку"}
+            title={hasTasks ? "Clear column of tasks to delete" : "Delete column"}
             placement="top"
           >
             <span>
@@ -125,8 +125,8 @@ export default function TitleColumn({ id, title, taskCount = 0 }: BoardColumnPro
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmDelete}
-        title="Видалити колонку"
-        description={`Ви впевнені, що хочете видалити колонку "${title}"? Цю дію неможливо буде скасувати.`}
+        title="Delete column"
+        description={`Are you sure you want to delete the column "${title}"? This action cannot be undone.`}
         state={deleteState}
         isPending={isPendingDelete}
       />

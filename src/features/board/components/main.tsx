@@ -20,7 +20,7 @@ export default async function Board({ boardId }: { boardId?: string }) {
       {data ? (
         <DragDropWrapper boardId={activeBoard} initialData={data.columns} />
       ) : (
-        <CenteredMessage message="Будь ласка, створіть новудошку." />
+        <CenteredMessage message="Please create a new board." />
       )}
     </Box>
   );

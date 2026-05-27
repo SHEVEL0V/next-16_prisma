@@ -46,7 +46,7 @@ export default function EditorActions({
     <>
       <Box sx={{ minHeight: 40, display: "flex", gap: 0.5, ml: "auto" }}>
         {isEditing ? (
-          <Tooltip title="Скасувати">
+          <Tooltip title="Cancel">
             <IconButton
               size="small"
               onClick={(e) => {
@@ -59,7 +59,7 @@ export default function EditorActions({
           </Tooltip>
         ) : (
           <>
-            <Tooltip title="Редагувати">
+            <Tooltip title="Edit">
               <IconButton
                 size="small"
                 color="primary"
@@ -71,7 +71,7 @@ export default function EditorActions({
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Видалити">
+            <Tooltip title="Delete">
               <IconButton size="small" color="error" onClick={() => setIsDeleteDialogOpen(true)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>

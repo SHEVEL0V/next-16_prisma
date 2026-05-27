@@ -28,8 +28,8 @@ export default function NotFound() {
         </Typography>
         <Typography variant="h5">Page Not Found</Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          Сторінка, яку ви шукаєте, не існує або була видалена. Будь ласка, перевірте URL або
-          поверніться на головну сторінку.
+          The page you are looking for does not exist or has been deleted. Please check the URL or
+          return to the home page.
         </Typography>
         <Button component={Link} href="/" variant="contained">
           Back to Home
