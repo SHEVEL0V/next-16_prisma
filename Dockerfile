@@ -12,9 +12,6 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-RUN npx prisma generate --skip-validation # Generate Prisma client without URL validation
-
 RUN npm run build
 
 # Stage 3 — Minimal Production Runner
@@ -48,4 +45,4 @@ USER nextjs
 EXPOSE 3000
 
 # Run migrations and start the server
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && node server.js"]
