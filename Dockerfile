@@ -1,23 +1,25 @@
-# Stage 1
+# ─────────────────────────────────────────
+# Stage 1 — Install dependencies
+# ─────────────────────────────────────────
 FROM node:24-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-
 COPY package*.json ./
 RUN npm ci
 
-
-
-# Stage 2
+# ─────────────────────────────────────────
+# Stage 2 — Build application
+# ─────────────────────────────────────────
 FROM node:24-alpine AS builder
 WORKDIR /app
-
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
 RUN npm run build
 
-# Stage 3 — Minimal Production Runner
+# ─────────────────────────────────────────
+# Stage 3 — Minimal production runner
+# ─────────────────────────────────────────
 FROM node:24-alpine AS runner
 WORKDIR /app
 
@@ -29,25 +31,23 @@ ENV NODE_ENV=production \
 RUN addgroup --system --gid 1001 nodejs && \
     adduser  --system --uid 1001 nextjs
 
-# Copy public static files
-COPY --from=builder /app/public ./public
+# Static assets
+COPY --from=builder --chown=nextjs:nodejs /app/public          ./public
 
-# Copy Next.js standalone build output
+# Next.js standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
 
-# Copy Prisma schema and config
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
-COPY --from=builder --chown=nextjs:nodejs /app/generated ./generated
+# Prisma schema + compiled config (якщо prisma.config.ts → компілюється в build)
+COPY --from=builder --chown=nextjs:nodejs /app/prisma          ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/generated       ./generated
 
-# Copy Prisma client and CLI
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+# Prisma client і CLI (без npx — явний шлях)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma    ./node_modules/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma   ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
 USER nextjs
-
 EXPOSE 3000
 
-# Run migrations and start the server
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+CMD ["node", "server.js"]
