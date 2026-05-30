@@ -12,6 +12,7 @@ RUN npm install --include=dev
 COPY prisma ./prisma/
 COPY prisma.config.ts ./
 
+
 EXPOSE 3000
 
 # Генеруємо клієнт відразу всередині образу та запускаємо сервер
