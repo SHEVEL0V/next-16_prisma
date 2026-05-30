@@ -82,7 +82,9 @@
     "deleteColumnTooltip": "Delete column",
     "clearColumnTooltip": "Clear column of tasks to delete",
     "deleteColumnTitle": "Delete column",
-    "confirmDeleteColumn": "Are you sure you want to delete the column \"{title}\"? This action cannot be undone."
+    "confirmDeleteColumn": "Are you sure you want to delete the column \"{title}\"? This action cannot be undone.",
+    "deleteBoard": "Delete board",
+    "confirmDelete": "Are you sure you want to delete the board \"{title}\"? This action cannot be undone."
   },
   "Dialog": {
     "cancel": "Cancel",
