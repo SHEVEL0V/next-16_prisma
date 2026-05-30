@@ -5,9 +5,8 @@
 # Usage:
 #   cp .env.example .env.local
 #   # fill in values in .env.local, then:
-#   docker compose up --build
+#   docker compose -f docker-compose.dev.yml --env-file .env.local up --build
 # =============================================================================
-
 services:
   # ---------------------------------------------------------------------------
   # PostgreSQL database
@@ -29,6 +28,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - dev
 
   # ---------------------------------------------------------------------------
   # Next.js application (development mode with hot reload)
@@ -37,7 +38,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-      # target: builder # stop at the builder stage — no need for the lean runner
     container_name: next_app
     restart: unless-stopped
     ports:
@@ -54,10 +54,21 @@ services:
       - /app/node_modules # keep container's node_modules (not the host's)
       - /app/.next # keep container's build cache
       - /app/generated # keep container's generated Prisma client
-    command: sh -c "npx prisma generate && npx prisma migrate dev --name init && npm run dev"
+    command: >
+      sh -c "
+        ./node_modules/.bin/prisma generate &&
+        ./node_modules/.bin/prisma migrate dev --skip-generate &&
+        npm run dev
+      "
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - dev
 
 volumes:
   postgres_data:
+
+networks:
+  dev:
+    driver: bridge
