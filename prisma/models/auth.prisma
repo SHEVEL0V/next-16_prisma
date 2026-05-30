@@ -1,0 +1,45 @@
+/**
+ * Authentication Schema
+ * User authentication models and related types
+ */
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  name     String
+  password String
+  role     Role   @default(USER)
+
+  // Relations
+  profile       Profile? @relation("UserProfile")
+  boards        Board[]  @relation("BoardMembers")
+  assignedTasks Task[]   @relation("TaskAssignees")
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("User")
+}
+
+model Profile {
+  id       String  @id @default(uuid())
+  image    String? // URL до зображення профілю
+  position String? // Посада
+  bio      String? // Додаткова інформація
+
+  // Relations
+  userId String @unique
+  user   User   @relation("UserProfile", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Profile")
+}
