@@ -1,0 +1,118 @@
+{
+  "Common": {
+    "loading": "Завантаження...",
+    "error": "Щось пішло не так",
+    "tryAgain": "Спробувати знову",
+    "backToHome": "На головну",
+    "oops": "Ой!",
+    "notFound": "Сторінку не знайдено",
+    "notFoundDescription": "Сторінка, яку ви шукаєте, не існує або була видалена. Будь ласка, перевірте URL-адресу або поверніться на головну сторінку."
+  },
+  "Navigation": {
+    "home": "Головна",
+    "signin": "Увійти",
+    "signup": "Реєстрація",
+    "logout": "Вийти"
+  },
+  "Language": {
+    "en": "Англійська",
+    "uk": "Українська",
+    "selectLanguage": "Вибрати мову"
+  },
+  "Footer": {
+    "copyright": "Всі права захищено.",
+    "contact": "Зв'яжіться з нами",
+    "privacy": "Політика конфіденційності",
+    "terms": "Умови обслуговування"
+  },
+  "Header": {
+    "welcome": "Ласкаво просимо до UI",
+    "goBack": "Назад",
+    "goHome": "На головну",
+    "lightMode": "Світла тема",
+    "darkMode": "Темна тема"
+  },
+  "ProfileMenu": {
+    "profile": "Профіль",
+    "signOut": "Вийти"
+  },
+  "Menu": {
+    "board": "Дошка",
+    "taskList": "Список завдань"
+  },
+  "Profile": {
+    "settings": "Налаштування профілю",
+    "email": "Електронна пошта",
+    "emailHelper": "Електронну пошту не можна змінити.",
+    "name": "Ім'я",
+    "position": "Посада",
+    "avatar": "Аватар (URL зображення)",
+    "bio": "Про мене / Біографія",
+    "saving": "Збереження...",
+    "saveChanges": "Зберегти зміни"
+  },
+  "Tasks": {
+    "title": "Назва",
+    "description": "Опис",
+    "board": "Дошка",
+    "status": "Статус",
+    "priority": "Пріоритет",
+    "created": "Створено",
+    "noTasks": "Завдань не знайдено",
+    "createTaskOnBoard": "Створіть завдання на дошці, щоб побачити його тут"
+  },
+  "Board": {
+    "createBoardPrompt": "Будь ласка, створіть нову дошку.",
+    "boardsTitle": "Дошки",
+    "newBoardPlaceholder": "Нова дошка...",
+    "createBoardTooltip": "Створити дошку",
+    "addColumnTooltip": "Додати нову колонку",
+    "createColumnTitle": "Створити нову колонку",
+    "columnNameLabel": "Назва колонки",
+    "columnNamePlaceholder": "Введіть назву колонки...",
+    "noTasks": "Немає завдань",
+    "addTaskPlaceholder": "Додати завдання...",
+    "taskDetails": "Деталі завдання",
+    "taskName": "Назва завдання",
+    "taskDescription": "Опис завдання",
+    "cancel": "Скасувати",
+    "create": "Створити",
+    "save": "Зберегти",
+    "saving": "Збереження...",
+    "deleteColumnTooltip": "Видалити колонку",
+    "clearColumnTooltip": "Очистіть колонку від завдань, щоб видалити її",
+    "deleteColumnTitle": "Видалити колонку",
+    "confirmDeleteColumn": "Ви впевнені, що хочете видалити колонку \"{title}\"? Цю дію неможливо скасувати."
+  },
+  "Dialog": {
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "deleting": "Видалення...",
+    "confirm": "Підтвердити дію",
+    "areYouSure": "Ви впевнені, що хочете виконати цю дію? Цю дію неможливо скасувати.",
+    "save": "Зберегти"
+  },
+  "Auth": {
+    "welcomeBack": "З поверненням",
+    "signInPrompt": "Будь ласка, введіть свої дані для входу",
+    "createAccount": "Створити акаунт",
+    "signUpPrompt": "Приєднуйтесь до нас, щоб почати керувати своїм меню",
+    "noAccount": "Немає акаунту?",
+    "signUp": "Зареєструватися",
+    "alreadyHaveAccount": "Вже маєте акаунт?",
+    "signIn": "Увійти",
+    "fullName": "Повне ім'я",
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "confirmPassword": "Підтвердіть пароль",
+    "register": "Зареєструватися",
+    "logIn": "Увійти"
+  },
+  "Editor": {
+    "cancel": "Скасувати",
+    "edit": "Редагувати",
+    "delete": "Видалити",
+    "deleteTitle": "Видалити",
+    "deleteDescription": "Ви впевнені, що хочете це видалити?"
+  }
+}
