@@ -1,60 +1,51 @@
-###############################################################################
-# Stage 1 — Install dependencies
-###############################################################################
+# Stage 1
 FROM node:24-alpine AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm ci
 
-###############################################################################
-# Stage 2 — Build the application
-###############################################################################
+# Stage 2
 FROM node:24-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client → ./generated/prisma (path set in schema.prisma)
-RUN npx prisma generate
+RUN npx prisma generate --skip-validation # Generate Prisma client without URL validation
 
-# Build Next.js
 RUN npm run build
 
-###############################################################################
-# Stage 3 — Production runner
-###############################################################################
+# Stage 3 — Minimal Production Runner
 FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
     PORT=3000 \
-    HOSTNAME=0.0.0.0
+    HOSTNAME=0.0.0.0 \
+    PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1
 
-# Security: run as non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser  --system --uid 1001 nextjs
 
-# Next.js build output
-COPY --from=builder --chown=nextjs:nodejs /app/.next            ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/public           ./public
-COPY --from=builder --chown=nextjs:nodejs /app/package.json     ./package.json
+# Copy public static files
+COPY --from=builder /app/public ./public
 
-# Full node_modules — guarantees all Prisma CLI transitive deps are present
-# (e.g. `effect` required by @prisma/config)
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules     ./node_modules
+# Copy Next.js standalone build output
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma generated client (engine binaries live here in Prisma 7)
-COPY --from=builder --chown=nextjs:nodejs /app/generated        ./generated
-
-# Prisma schema + migrations (needed for prisma migrate deploy)
-COPY --from=builder --chown=nextjs:nodejs /app/prisma           ./prisma
+# Copy Prisma schema and config
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
+
+# Copy generated Prisma client
+COPY --from=builder --chown=nextjs:nodejs /app/generated ./generated
 
 USER nextjs
 
 EXPOSE 3000
 
-# Run pending migrations, then start Next.js production server
-CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+# Run migrations and start the server
+CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]

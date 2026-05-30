@@ -36,8 +36,8 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
-      target: builder # stop at the builder stage — no need for the lean runner
+      dockerfile: Dockerfile.dev
+      # target: builder # stop at the builder stage — no need for the lean runner
     container_name: next_app
     restart: unless-stopped
     ports:
@@ -53,7 +53,8 @@ services:
       - .:/app # mount source for hot reload
       - /app/node_modules # keep container's node_modules (not the host's)
       - /app/.next # keep container's build cache
-    command: sh -c "npx prisma migrate deploy && npm run dev"
+      - /app/generated # keep container's generated Prisma client
+    command: sh -c "npx prisma generate && npx prisma migrate dev --name init && npm run dev"
     depends_on:
       db:
         condition: service_healthy

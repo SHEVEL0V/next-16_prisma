@@ -1,0 +1,18 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Копіюємо файли залежностей
+COPY package*.json ./
+
+# Встановлюємо абсолютно всі залежності (включаючи dev)
+RUN npm install --include=dev
+
+# Копіюємо файли конфігурації Prisma (потрібні для генерації)
+COPY prisma ./prisma/
+COPY prisma.config.ts ./
+
+EXPOSE 3000
+
+# Генеруємо клієнт відразу всередині образу та запускаємо сервер
+CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && npm start"]
