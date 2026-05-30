@@ -137,7 +137,7 @@ describe("Board Service", () => {
 
       (prisma.board.create as jest.Mock).mockResolvedValue(mockBoardWithColumns);
 
-      const result = await boardService.create(createData);
+      const result = await boardService.create(createData as unknown as Prisma.BoardCreateInput);
 
       expect(prisma.board.create).toHaveBeenCalledWith({
         data: {
@@ -151,7 +151,7 @@ describe("Board Service", () => {
           },
         },
       });
-      expect(result.columns).toHaveLength(2);
+      expect((result as unknown as { columns: unknown[] }).columns).toHaveLength(2);
     });
 
     it("should handle database constraint violations", async () => {
@@ -159,7 +159,10 @@ describe("Board Service", () => {
       (prisma.board.create as jest.Mock).mockRejectedValue(error);
 
       await expect(
-        boardService.create({ title: "New Board", userId: "user-123" }),
+        boardService.create({
+          title: "New Board",
+          userId: "user-123",
+        } as unknown as Prisma.BoardCreateInput),
       ).rejects.toThrow();
     });
 

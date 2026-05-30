@@ -6,14 +6,17 @@ import { Box, Tooltip, IconButton, CircularProgress } from "@mui/material";
 import { Edit as EditIcon, Close as CloseIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import CustomDialog from "@/components/ui/modals/custom-dialog";
 
-type EditorProps = {
+import type { Dict } from "@/types";
+
+interface EditorProps {
   isEditing: boolean;
   isPending: boolean;
   onEdit: () => void;
   onCancel: () => void;
   id: string;
   actionDelete: (formData: FormData) => void;
-};
+  dict?: Dict;
+}
 
 export default function EditorActions({
   isEditing,
@@ -22,9 +25,11 @@ export default function EditorActions({
   onCancel,
   actionDelete,
   id,
+  dict,
 }: EditorProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, startDelete] = useTransition();
+  const dictEditor = dict?.Editor;
 
   const handleConfirmDelete = () => {
     startDelete(() => {
@@ -46,7 +51,7 @@ export default function EditorActions({
     <>
       <Box sx={{ minHeight: 40, display: "flex", gap: 0.5, ml: "auto" }}>
         {isEditing ? (
-          <Tooltip title="Cancel">
+          <Tooltip title={dict?.Editor?.cancel || "Cancel"}>
             <IconButton
               size="small"
               onClick={(e) => {
@@ -59,7 +64,7 @@ export default function EditorActions({
           </Tooltip>
         ) : (
           <>
-            <Tooltip title="Edit">
+            <Tooltip title={dict?.Editor?.edit || "Edit"}>
               <IconButton
                 size="small"
                 color="primary"
@@ -71,7 +76,7 @@ export default function EditorActions({
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete">
+            <Tooltip title={dict?.Editor?.delete || "Delete"}>
               <IconButton size="small" color="error" onClick={() => setIsDeleteDialogOpen(true)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>
@@ -84,7 +89,10 @@ export default function EditorActions({
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmDelete}
+        title={dictEditor?.deleteTitle || "Delete"}
+        description={dictEditor?.deleteDescription || "Are you sure you want to delete this?"}
         isPending={isDeleting}
+        dict={dict?.Dialog}
       />
     </>
   );

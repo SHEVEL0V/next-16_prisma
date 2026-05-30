@@ -7,12 +7,15 @@ import { TextField, IconButton, Box, Typography, alpha, useTheme } from "@mui/ma
 import AddIcon from "@mui/icons-material/Add";
 import { createTaskAction } from "../../actions";
 
+import type { Dict } from "@/types";
+
 interface TaskCreateFormProps {
   columnId: string;
   boardId: string;
+  dict?: Dict;
 }
 
-export default function TaskCreateForm({ columnId, boardId }: TaskCreateFormProps) {
+export default function TaskCreateForm({ columnId, boardId, dict }: TaskCreateFormProps) {
   const theme = useTheme();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -36,7 +39,7 @@ export default function TaskCreateForm({ columnId, boardId }: TaskCreateFormProp
 
       <TextField
         name="title"
-        placeholder="Add task..."
+        placeholder={dict?.Board?.addTaskPlaceholder || "Add task..."}
         fullWidth
         size="small"
         disabled={isPending}

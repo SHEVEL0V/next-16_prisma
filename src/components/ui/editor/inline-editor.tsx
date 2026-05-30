@@ -7,12 +7,15 @@ import ErrorMessage from "@/components/ui/editor/error-message";
 import EditableTypography from "@/components/ui/fields/editable-typography";
 import EditableTextField from "../fields/editable-text-field";
 
+import type { Dict } from "@/types";
+
 interface EditorProps<T> {
   data: { id: string; value: string; name: string };
   update: ActionType<T>;
   remove: ActionType<T>;
   children?: React.ReactNode;
   onViewDetails?: () => void;
+  dict?: Dict;
 }
 
 export default function InlineEditor<T>({
@@ -21,6 +24,7 @@ export default function InlineEditor<T>({
   remove,
   children,
   onViewDetails,
+  dict,
 }: EditorProps<T>) {
   const [isEditing, setIsEditing] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -114,6 +118,7 @@ export default function InlineEditor<T>({
             onCancel={() => setIsEditing(false)}
             id={id}
             actionDelete={actionDelete}
+            dict={dict}
           />
         </Box>
       </Box>

@@ -16,11 +16,14 @@ import {
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { createColumnAction } from "../../actions";
 
+import type { Dict } from "@/types";
+
 interface ColumnCreateFormProps {
   boardId: string;
+  dict?: Dict;
 }
 
-export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
+export default function ColumnCreateForm({ boardId, dict }: ColumnCreateFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +50,7 @@ export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
 
   return (
     <>
-      <Tooltip title="Add new column" placement="top" arrow>
+      <Tooltip title={dict?.Board?.addColumnTooltip || "Add new column"} placement="top" arrow>
         <Box
           sx={{
             display: "flex",
@@ -62,6 +65,8 @@ export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
             aria-label="add column"
             onClick={() => setIsOpen(true)}
             sx={{
+              bgcolor: "background.paper",
+              color: "primary.main",
               "&:hover": { transform: "scale(1.05)", transition: "all 0.2s" },
             }}
           >
@@ -71,14 +76,16 @@ export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
       </Tooltip>
 
       <Dialog open={isOpen} onClose={() => !isPending && setIsOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ pb: 1 }}>Create new column</DialogTitle>
+        <DialogTitle sx={{ pb: 1 }}>
+          {dict?.Board?.createColumnTitle || "Create new column"}
+        </DialogTitle>
         <form action={actionCreate} ref={formRef}>
           <DialogContent sx={{ pb: 2 }}>
             <input type="hidden" name="boardId" value={boardId} />
             <TextField
               name="title"
-              label="Column name"
-              placeholder="Enter column name..."
+              label={dict?.Board?.columnNameLabel || "Column name"}
+              placeholder={dict?.Board?.columnNamePlaceholder || "Enter column name..."}
               fullWidth
               size="medium"
               disabled={isPending}
@@ -94,7 +101,7 @@ export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
               color="inherit"
               sx={{ borderRadius: 2 }}
             >
-              Cancel
+              {dict?.Board?.cancel || "Cancel"}
             </Button>
             <Button
               type="submit"
@@ -103,7 +110,7 @@ export default function ColumnCreateForm({ boardId }: ColumnCreateFormProps) {
               color="primary"
               sx={{ borderRadius: 2 }}
             >
-              Create
+              {dict?.Board?.create || "Create"}
             </Button>
           </DialogActions>
         </form>

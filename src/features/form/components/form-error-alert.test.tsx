@@ -48,7 +48,7 @@ describe("FormErrorAlert Component", () => {
     it("should render success alert on success", () => {
       const state: ActionResponse<Record<string, unknown>> = {
         success: true,
-        errors: {},
+        data: {},
         message: "Operation successful",
       };
 
@@ -79,7 +79,7 @@ describe("FormErrorAlert Component", () => {
     it("should handle error state message", () => {
       const state: ActionResponse<Record<string, unknown>> = {
         success: false,
-        errors: { email: "Invalid email" },
+        errors: { email: ["Invalid email"] },
         message: "Validation failed",
       };
 
@@ -90,7 +90,7 @@ describe("FormErrorAlert Component", () => {
     it("should handle success state message", () => {
       const state: ActionResponse<Record<string, unknown>> = {
         success: true,
-        errors: {},
+        data: {},
         message: "Changes saved successfully",
       };
 

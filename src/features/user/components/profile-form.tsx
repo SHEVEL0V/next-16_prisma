@@ -15,9 +15,20 @@ interface ProfileFormProps {
       bio?: string;
     };
   };
+  dict?: {
+    settings?: string;
+    email?: string;
+    emailHelper?: string;
+    name?: string;
+    position?: string;
+    avatar?: string;
+    bio?: string;
+    saving?: string;
+    saveChanges?: string;
+  };
 }
 
-export default function ProfileForm({ user }: ProfileFormProps) {
+export default function ProfileForm({ user, dict }: ProfileFormProps) {
   const [state, action, isPending] = useActionState(updateProfileAction, {
     success: false,
     errors: {},
@@ -32,7 +43,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       sx={{ p: { xs: 2, md: 4 }, maxWidth: 700, mx: "auto", borderRadius: 3 }}
     >
       <Typography variant="h5" sx={{ mb: 3, fontWeight: "bold" }}>
-        Profile Settings
+        {dict?.settings || "Profile Settings"}
       </Typography>
 
       {state.message && state.success && (
@@ -52,15 +63,15 @@ export default function ProfileForm({ user }: ProfileFormProps) {
 
         <Stack spacing={3}>
           <TextField
-            label="Email"
+            label={dict?.email || "Email"}
             defaultValue={user.email}
             disabled
             fullWidth
-            helperText="Email cannot be changed."
+            helperText={dict?.emailHelper || "Email cannot be changed."}
           />
 
           <TextField
-            label="Name"
+            label={dict?.name || "Name"}
             name="name"
             defaultValue={user.name}
             fullWidth
@@ -69,7 +80,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           />
 
           <TextField
-            label="Position"
+            label={dict?.position || "Position"}
             name="position"
             defaultValue={user.profile?.position || ""}
             fullWidth
@@ -78,7 +89,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           />
 
           <TextField
-            label="Avatar (Image URL)"
+            label={dict?.avatar || "Avatar (Image URL)"}
             name="image"
             defaultValue={user.profile?.image || ""}
             fullWidth
@@ -87,7 +98,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           />
 
           <TextField
-            label="About Me / Biography"
+            label={dict?.bio || "About Me / Biography"}
             name="bio"
             defaultValue={user.profile?.bio || ""}
             multiline
@@ -104,7 +115,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             disabled={isPending}
             sx={{ alignSelf: "flex-start", px: 4, py: 1.5 }}
           >
-            {isPending ? "Saving..." : "Save changes"}
+            {isPending ? dict?.saving || "Saving..." : dict?.saveChanges || "Save changes"}
           </Button>
         </Stack>
       </Box>

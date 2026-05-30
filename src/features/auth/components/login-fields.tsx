@@ -2,12 +2,12 @@
 
 import { TextField, Stack, Alert } from "@mui/material";
 import { Button } from "@/components/ui/buttons";
-import type { ActionResponse } from "@/types";
-import { MESSAGES } from "@/constants";
+import type { ActionResponse, Dict } from "@/types";
 
 interface LoginFieldsProps<T> {
   state: ActionResponse<T>;
   isPending: boolean;
+  dict?: Dict;
 }
 
 const LOGIN_FIELDS = [
@@ -32,7 +32,7 @@ const LOGIN_FIELDS = [
  * LoginFields Component
  * Renders login form fields (email, password) and submit button
  */
-export default function LoginFields<T>({ state, isPending }: LoginFieldsProps<T>) {
+export default function LoginFields<T>({ state, isPending, dict }: LoginFieldsProps<T>) {
   const errors = "errors" in state ? state.errors : undefined;
 
   return (
@@ -46,6 +46,11 @@ export default function LoginFields<T>({ state, isPending }: LoginFieldsProps<T>
           error={!!errors?.[field.name as keyof typeof errors]}
           helperText={errors?.[field.name as keyof typeof errors]?.[0]}
           {...field}
+          label={
+            field.name === "email"
+              ? dict?.Auth?.email || field.label
+              : dict?.Auth?.password || field.label
+          }
         />
       ))}
 
@@ -56,8 +61,12 @@ export default function LoginFields<T>({ state, isPending }: LoginFieldsProps<T>
         </Alert>
       )}
 
-      <Button variant="submit" loading={isPending} loadingText={MESSAGES.loading}>
-        {MESSAGES.login}
+      <Button
+        variant="submit"
+        loading={isPending}
+        loadingText={dict?.Common?.loading || "Loading..."}
+      >
+        {dict?.Auth?.logIn || "Log In"}
       </Button>
     </Stack>
   );

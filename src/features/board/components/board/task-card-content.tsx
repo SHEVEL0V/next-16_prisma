@@ -11,10 +11,13 @@ import type { DraggableStateSnapshot, DraggableProvided } from "@hello-pangea/dn
 import TaskPriorityToggle from "./task-priority-toggle";
 import TaskDetailsModal from "./task-details-modal";
 
+import type { Dict } from "@/types";
+
 interface TaskCardContentProps {
   task: TaskType;
   snapshot: DraggableStateSnapshot;
   provided: DraggableProvided;
+  dict?: Dict;
 }
 
 /**
@@ -27,7 +30,12 @@ interface TaskCardContentProps {
  * @param {DraggableStateSnapshot} snapshot - Drag state from dnd provider
  * @param {DraggableProvided} provided - Draggable props from dnd provider
  */
-export default memo(function TaskCardContent({ task, snapshot, provided }: TaskCardContentProps) {
+export default memo(function TaskCardContent({
+  task,
+  snapshot,
+  provided,
+  dict,
+}: TaskCardContentProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -60,6 +68,7 @@ export default memo(function TaskCardContent({ task, snapshot, provided }: TaskC
                   update={updateTaskAction}
                   remove={deleteTaskAction}
                   onViewDetails={() => setIsModalOpen(true)}
+                  dict={dict}
                 >
                   <TaskPriorityToggle task={task} />
                 </InlineEditor>
@@ -70,7 +79,12 @@ export default memo(function TaskCardContent({ task, snapshot, provided }: TaskC
       </div>
 
       {isModalOpen && (
-        <TaskDetailsModal open={isModalOpen} onClose={() => setIsModalOpen(false)} task={task} />
+        <TaskDetailsModal
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          task={task}
+          dict={dict}
+        />
       )}
     </>
   );

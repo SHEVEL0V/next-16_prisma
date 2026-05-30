@@ -11,12 +11,15 @@ import BoardItem from "./sidebar-item";
 const DRAWER_WIDTH = 280;
 const COLLAPSED_WIDTH = 80;
 
+import type { Dict } from "@/types";
+
 type SidebarProps = {
   boards: { id: string; title: string }[];
   activeBoard?: string;
+  dict?: Dict;
 };
 
-export default function Sidebar({ boards, activeBoard }: SidebarProps) {
+export default function Sidebar({ boards, activeBoard, dict }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
@@ -45,7 +48,7 @@ export default function Sidebar({ boards, activeBoard }: SidebarProps) {
       >
         {isOpen && (
           <Typography id="board-title" variant="h6" sx={{ fontWeight: "bold" }}>
-            Boards
+            {dict?.Board?.boardsTitle || "Boards"}
           </Typography>
         )}
         <IconButton onClick={toggleSidebar}>{isOpen ? <MenuOpenIcon /> : <MenuIcon />}</IconButton>
@@ -61,12 +64,13 @@ export default function Sidebar({ boards, activeBoard }: SidebarProps) {
             title={board.title}
             isActive={board.id === activeBoard}
             isOpen={isOpen}
+            dict={dict}
           />
         ))}
       </List>
 
       <Divider />
-      <CreateBoardForm isOpen={isOpen} />
+      <CreateBoardForm isOpen={isOpen} dict={dict} />
     </Box>
   );
 }

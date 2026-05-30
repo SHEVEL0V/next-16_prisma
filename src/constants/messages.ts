@@ -1,7 +1,7 @@
-/**
- * UI Messages
- * Centralized localization strings for UI components
- */
+// /**
+//  * UI Messages
+//  * Centralized localization strings for UI components
+//  */
 
 export const MESSAGES = {
   // Common actions

@@ -4,7 +4,16 @@
 import React from "react";
 import { Box, Container, Typography, Stack, Link, alpha, useTheme } from "@mui/material";
 
-export default function Footer() {
+interface FooterProps {
+  dict: {
+    copyright: string;
+    contact: string;
+    privacy: string;
+    terms: string;
+  };
+}
+
+export default function Footer({ dict }: FooterProps) {
   const theme = useTheme();
   const currentYear = new Date().getFullYear();
 
@@ -38,7 +47,7 @@ export default function Footer() {
               fontWeight: 500,
             }}
           >
-            © {currentYear} UI Portal. All rights reserved.
+            © {currentYear} UI Portal. {dict.copyright}
           </Typography>
 
           <Stack
@@ -56,9 +65,9 @@ export default function Footer() {
               },
             }}
           >
-            <Link href="/privacy">Privacy Policy</Link>
-            <Link href="/terms">Terms of Use</Link>
-            <Link href="/contact">Contact</Link>
+            <Link href="/privacy">{dict.privacy}</Link>
+            <Link href="/terms">{dict.terms}</Link>
+            <Link href="/contact">{dict.contact}</Link>
           </Stack>
         </Stack>
       </Container>

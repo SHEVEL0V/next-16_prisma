@@ -7,7 +7,9 @@ import DragDropWrapper from "@/features/board/components/drag-drop";
 import Sidebar from "@/features/board/components/sidebar/sidebar";
 import { getBoardById, getBoards } from "@/features/board/queries";
 
-export default async function Board({ boardId }: { boardId?: string }) {
+import type { Dict } from "@/types";
+
+export default async function Board({ boardId, dict }: { boardId?: string; dict?: Dict }) {
   const boards = (await getBoards())?.data ?? [];
 
   const activeBoard = boardId || boards[0]?.id;
@@ -16,11 +18,11 @@ export default async function Board({ boardId }: { boardId?: string }) {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Sidebar boards={boards} activeBoard={activeBoard} />
+      <Sidebar boards={boards} activeBoard={activeBoard} dict={dict} />
       {data ? (
-        <DragDropWrapper boardId={activeBoard} initialData={data.columns} />
+        <DragDropWrapper boardId={activeBoard} initialData={data.columns} dict={dict} />
       ) : (
-        <CenteredMessage message="Please create a new board." />
+        <CenteredMessage message={dict?.Board?.createBoardPrompt || "Please create a new board."} />
       )}
     </Box>
   );
