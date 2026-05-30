@@ -8,7 +8,16 @@ import Link from "next/link";
  * Not Found Page (404)
  * Displays when a route is not found
  */
-export default function NotFound() {
+import { getDictionary } from "@/dictionaries";
+import { ROUTES } from "@/constants";
+import { headers } from "next/headers";
+
+export default async function NotFound() {
+  const headersList = await headers();
+  const acceptLanguage = headersList.get("accept-language");
+  const lang = acceptLanguage?.startsWith("uk") ? "uk" : "en";
+  const dict = await getDictionary(lang as "en" | "uk");
+
   return (
     <Container maxWidth="md">
       <Box
@@ -26,14 +35,13 @@ export default function NotFound() {
         <Typography variant="h2" sx={{ fontWeight: 700 }}>
           404
         </Typography>
-        <Typography variant="h5">Page Not Found</Typography>
+        <Typography variant="h5">{dict.Common.notFound}</Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          The page you are looking for does not exist or has been deleted. Please check the URL or
-          return to the home page.
+          {dict.Common.notFoundDescription}
         </Typography>
-        <Button component={Link} href="/" variant="contained">
-          Back to Home
-        </Button>
+        <Link href={ROUTES.home(lang)} passHref style={{ textDecoration: "none" }}>
+          <Button variant="contained">{dict.Common.backToHome}</Button>
+        </Link>
       </Box>
     </Container>
   );

@@ -7,11 +7,13 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/buttons";
 import { createBoardAction } from "../../actions";
 
+import type { Dict } from "@/types";
+
 /**
  * CreateBoardForm Component
  * Form for creating a new board with inline title input and add button
  */
-export default function CreateBoardForm({ isOpen }: { isOpen: boolean }) {
+export default function CreateBoardForm({ isOpen, dict }: { isOpen: boolean; dict?: Dict }) {
   const [state, formAction, isPending] = useActionState(createBoardAction, {
     success: false,
     errors: {},
@@ -32,7 +34,7 @@ export default function CreateBoardForm({ isOpen }: { isOpen: boolean }) {
           <TextField
             name="title"
             size="small"
-            placeholder="New board..."
+            placeholder={dict?.Board?.newBoardPlaceholder || "New board..."}
             required
             fullWidth
             variant="outlined"
@@ -41,9 +43,9 @@ export default function CreateBoardForm({ isOpen }: { isOpen: boolean }) {
         <Button
           variant="add"
           type="submit"
-          title="Create board"
+          title={dict?.Board?.createBoardTooltip || "Create board"}
           disabled={isPending}
-          tooltip="Create board"
+          tooltip={dict?.Board?.createBoardTooltip || "Create board"}
         />
       </form>
 

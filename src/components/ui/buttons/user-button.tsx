@@ -20,8 +20,19 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import Logout from "@mui/icons-material/Logout";
 import Person from "@mui/icons-material/Person";
 
-function ButtonUser() {
+interface UserButtonProps {
+  dict?: {
+    profile?: string;
+    signOut?: string;
+  };
+}
+
+function ButtonUser({ dict }: UserButtonProps) {
   const router = useRouter();
+
+  // Дефолтні переклади
+  const profileLabel = dict?.profile || "Profile";
+  const signOutLabel = dict?.signOut || "Sign Out";
 
   // Menu state management
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -53,7 +64,7 @@ function ButtonUser() {
   return (
     <>
       {/* Menu trigger button */}
-      <Tooltip title="Profile settings">
+      <Tooltip title={profileLabel}>
         <IconButton
           onClick={handleClick}
           size="large"
@@ -105,7 +116,7 @@ function ButtonUser() {
           <ListItemIcon>
             <Person fontSize="small" />
           </ListItemIcon>
-          Profile
+          {profileLabel}
         </MenuItem>
 
         <Divider />
@@ -115,7 +126,7 @@ function ButtonUser() {
           <ListItemIcon>
             <Logout fontSize="small" color="error" />
           </ListItemIcon>
-          Sign Out
+          {signOutLabel}
         </MenuItem>
       </Menu>
     </>

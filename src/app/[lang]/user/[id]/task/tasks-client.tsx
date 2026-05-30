@@ -19,17 +19,27 @@ export interface TaskRow {
 
 interface TasksClientProps {
   rows: TaskRow[];
+  dict?: {
+    title?: string;
+    description?: string;
+    board?: string;
+    status?: string;
+    priority?: string;
+    created?: string;
+    noTasks?: string;
+    createTaskOnBoard?: string;
+  };
 }
 
 /**
  * Tasks Client Component
  * Renders tasks grid with priority visualization and responsive layout
  */
-export function TasksClient({ rows }: TasksClientProps) {
+export function TasksClient({ rows, dict }: TasksClientProps) {
   const columns: GridColDef[] = [
     {
       field: "title",
-      headerName: "Title",
+      headerName: dict?.title || "Title",
       flex: 2,
       minWidth: 200,
       headerAlign: "left",
@@ -37,7 +47,7 @@ export function TasksClient({ rows }: TasksClientProps) {
     },
     {
       field: "description",
-      headerName: "Description",
+      headerName: dict?.description || "Description",
       flex: 2,
       minWidth: 250,
       headerAlign: "left",
@@ -46,7 +56,7 @@ export function TasksClient({ rows }: TasksClientProps) {
     },
     {
       field: "board_title",
-      headerName: "Board",
+      headerName: dict?.board || "Board",
       flex: 1,
       minWidth: 120,
       headerAlign: "center",
@@ -54,7 +64,7 @@ export function TasksClient({ rows }: TasksClientProps) {
     },
     {
       field: "status",
-      headerName: "Status",
+      headerName: dict?.status || "Status",
       flex: 1,
       minWidth: 120,
       headerAlign: "center",
@@ -62,7 +72,7 @@ export function TasksClient({ rows }: TasksClientProps) {
     },
     {
       field: "priority",
-      headerName: "Priority",
+      headerName: dict?.priority || "Priority",
       flex: 1,
       minWidth: 100,
       headerAlign: "center",
@@ -78,7 +88,7 @@ export function TasksClient({ rows }: TasksClientProps) {
     },
     {
       field: "date",
-      headerName: "Created",
+      headerName: dict?.created || "Created",
       flex: 1,
       minWidth: 100,
       headerAlign: "center",
@@ -106,10 +116,10 @@ export function TasksClient({ rows }: TasksClientProps) {
           }}
         >
           <Typography variant="h6" color="text.secondary" gutterBottom>
-            No tasks found
+            {dict?.noTasks || "No tasks found"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Create a task on a board to see it here
+            {dict?.createTaskOnBoard || "Create a task on a board to see it here"}
           </Typography>
         </Paper>
       </Box>

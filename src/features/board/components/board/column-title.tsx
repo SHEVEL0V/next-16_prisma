@@ -10,15 +10,23 @@ import EditableTypography from "@/components/ui/fields/editable-typography";
 import { deleteColumnAction, updateColumnAction } from "../../actions";
 import CustomDialog from "@/components/ui/modals/custom-dialog";
 
+import type { Dict } from "@/types";
+
 interface BoardColumnProps {
   id: string;
   title: string;
   taskCount?: number;
+  dict?: Dict;
 }
 
-export default function TitleColumn({ id, title, taskCount = 0 }: BoardColumnProps) {
+export default function TitleColumn({ id, title, taskCount = 0, dict }: BoardColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const deleteDialogDict = {
+    cancel: dict?.Dialog?.cancel || "Cancel",
+    delete: dict?.Board?.deleteColumnTitle || "Delete",
+    deleting: dict?.Dialog?.deleting || "Deleting...",
+  };
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [isPendingDelete, startTransitionDelete] = useTransition();
@@ -56,6 +64,9 @@ export default function TitleColumn({ id, title, taskCount = 0 }: BoardColumnPro
   };
 
   const hasTasks = taskCount > 0;
+  const deleteTooltip = hasTasks
+    ? dict?.Board?.clearColumnTooltip || "Clear column of tasks to delete"
+    : dict?.Board?.deleteColumnTooltip || "Delete column";
 
   return (
     <>
@@ -100,10 +111,7 @@ export default function TitleColumn({ id, title, taskCount = 0 }: BoardColumnPro
             transform: "translateY(-50%)",
           }}
         >
-          <Tooltip
-            title={hasTasks ? "Clear column of tasks to delete" : "Delete column"}
-            placement="top"
-          >
+          <Tooltip title={deleteTooltip} placement="top">
             <span>
               <IconButton
                 onClick={() => setIsDeleteDialogOpen(true)}
@@ -125,10 +133,14 @@ export default function TitleColumn({ id, title, taskCount = 0 }: BoardColumnPro
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete column"
-        description={`Are you sure you want to delete the column "${title}"? This action cannot be undone.`}
+        title={dict?.Board?.deleteColumnTitle || "Delete column"}
+        description={
+          dict?.Board?.confirmDeleteColumn?.replace("{title}", title) ||
+          `Are you sure you want to delete the column "${title}"? This action cannot be undone.`
+        }
         state={deleteState}
         isPending={isPendingDelete}
+        dict={deleteDialogDict}
       />
     </>
   );

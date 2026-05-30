@@ -9,14 +9,17 @@ import { MoreButton } from "@/components/ui/buttons";
 import { deleteBoardAction, updateBoardAction } from "../../actions";
 import CustomDialog from "@/components/ui/modals/custom-dialog";
 
+import type { Dict } from "@/types";
+
 interface SidebarItemProps {
   id: string;
   title: string;
   isActive: boolean;
   isOpen: boolean;
+  dict?: Dict;
 }
 
-export default function SidebarItem({ id, title, isActive, isOpen }: SidebarItemProps) {
+export default function SidebarItem({ id, title, isActive, isOpen, dict }: SidebarItemProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -98,6 +101,7 @@ export default function SidebarItem({ id, title, isActive, isOpen }: SidebarItem
                         onClickEditAction={() => setIsEditing(true)}
                         onClickDeleteAction={() => setIsDeleteDialogOpen(true)}
                         isPending={isPending}
+                        dict={dict}
                       />
                     </Box>
                   </>
@@ -112,10 +116,14 @@ export default function SidebarItem({ id, title, isActive, isOpen }: SidebarItem
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete board"
-        description={`Are you sure you want to delete the board "${title}"? This action cannot be undone.`}
+        title={dict?.Board?.deleteBoard || "Delete board"}
+        description={(
+          dict?.Board?.confirmDelete ||
+          'Are you sure you want to delete the board "{title}"? This action cannot be undone.'
+        ).replace("{title}", title)}
         state={deleteState}
         isPending={isPendingDelete}
+        dict={dict?.Dialog}
       />
     </>
   );

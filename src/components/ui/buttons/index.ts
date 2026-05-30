@@ -11,3 +11,4 @@ export { IconButtonBase } from "./icon-button-base";
 export type { IconButtonBaseProps } from "./icon-button-base";
 export { default as MoreButton } from "./more-button";
 export { default as UserButton } from "./user-button";
+export { default as LanguageSwitcher } from "./language-switcher";

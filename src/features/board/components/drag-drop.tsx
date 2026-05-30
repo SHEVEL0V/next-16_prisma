@@ -10,12 +10,16 @@ import type { ColumnType } from "../types";
 import Column from "./board/board-column";
 import ColumnCreateForm from "./board/column-create-form";
 
+import type { Dict } from "@/types";
+
 export default function DragDropWrapper({
   initialData,
   boardId,
+  dict,
 }: {
   initialData: ColumnType[];
   boardId: string;
+  dict?: Dict;
 }) {
   const [isPending, startTransitionAction] = useTransition();
 
@@ -106,13 +110,13 @@ export default function DragDropWrapper({
                     {...provided.dragHandleProps}
                     style={provided.draggableProps.style}
                   >
-                    <Column column={column} boardId={boardId} />
+                    <Column column={column} boardId={boardId} dict={dict} />
                   </div>
                 )}
               </Draggable>
             ))}
             {provided.placeholder}
-            <ColumnCreateForm boardId={boardId} />
+            <ColumnCreateForm boardId={boardId} dict={dict} />
           </Stack>
         )}
       </Droppable>

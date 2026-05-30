@@ -1,0 +1,120 @@
+{
+  "Common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "tryAgain": "Try Again",
+    "backToHome": "Back to Home",
+    "oops": "Oops!",
+    "notFound": "Page Not Found",
+    "notFoundDescription": "The page you are looking for does not exist or has been deleted. Please check the URL or return to the home page."
+  },
+  "Navigation": {
+    "home": "Home",
+    "signin": "Sign In",
+    "signup": "Sign Up",
+    "logout": "Log Out"
+  },
+  "Language": {
+    "en": "English",
+    "uk": "Ukrainian",
+    "selectLanguage": "Select Language"
+  },
+  "Footer": {
+    "copyright": "All rights reserved.",
+    "contact": "Contact Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "Header": {
+    "welcome": "Welcome to UI",
+    "goBack": "Go back",
+    "goHome": "Go to home",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode"
+  },
+  "ProfileMenu": {
+    "profile": "Profile",
+    "signOut": "Sign Out"
+  },
+  "Menu": {
+    "board": "Board",
+    "taskList": "Task List"
+  },
+  "Profile": {
+    "settings": "Profile Settings",
+    "email": "Email",
+    "emailHelper": "Email cannot be changed.",
+    "name": "Name",
+    "position": "Position",
+    "avatar": "Avatar (Image URL)",
+    "bio": "About Me / Biography",
+    "saving": "Saving...",
+    "saveChanges": "Save changes"
+  },
+  "Tasks": {
+    "title": "Title",
+    "description": "Description",
+    "board": "Board",
+    "status": "Status",
+    "priority": "Priority",
+    "created": "Created",
+    "noTasks": "No tasks found",
+    "createTaskOnBoard": "Create a task on a board to see it here"
+  },
+  "Board": {
+    "createBoardPrompt": "Please create a new board.",
+    "boardsTitle": "Boards",
+    "newBoardPlaceholder": "New board...",
+    "createBoardTooltip": "Create board",
+    "addColumnTooltip": "Add new column",
+    "createColumnTitle": "Create new column",
+    "columnNameLabel": "Column name",
+    "columnNamePlaceholder": "Enter column name...",
+    "noTasks": "No tasks",
+    "addTaskPlaceholder": "Add task...",
+    "taskDetails": "Task details",
+    "taskName": "Task Name",
+    "taskDescription": "Task Description",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "saving": "Saving...",
+    "deleteColumnTooltip": "Delete column",
+    "clearColumnTooltip": "Clear column of tasks to delete",
+    "deleteColumnTitle": "Delete column",
+    "confirmDeleteColumn": "Are you sure you want to delete the column \"{title}\"? This action cannot be undone.",
+    "deleteBoard": "Delete board",
+    "confirmDelete": "Are you sure you want to delete the board \"{title}\"? This action cannot be undone."
+  },
+  "Dialog": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "confirm": "Confirm action",
+    "areYouSure": "Are you sure you want to perform this action? This action cannot be undone.",
+    "save": "Save"
+  },
+  "Auth": {
+    "welcomeBack": "Welcome back",
+    "signInPrompt": "Please enter your details to sign in",
+    "createAccount": "Create an account",
+    "signUpPrompt": "Join us to start managing your menu",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "register": "Register",
+    "logIn": "Log In"
+  },
+  "Editor": {
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteTitle": "Delete",
+    "deleteDescription": "Are you sure you want to delete this?"
+  }
+}

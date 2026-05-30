@@ -14,14 +14,18 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
+import type { Dict } from "@/types";
+
 export default function MoreButton({
   onClickEditAction,
   onClickDeleteAction,
   isPending = false,
+  dict,
 }: {
   onClickEditAction: () => void;
   onClickDeleteAction: () => void;
   isPending?: boolean;
+  dict?: Dict;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -73,14 +77,14 @@ export default function MoreButton({
           <ListItemIcon>
             <EditOutlinedIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Edit</ListItemText>
+          <ListItemText>{dict?.Editor?.edit || "Edit"}</ListItemText>
         </MenuItem>
 
         <MenuItem onClick={handleDelete} disabled={isPending} color="error">
           <ListItemIcon>
             <DeleteOutlineIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
+          <ListItemText>{dict?.Editor?.delete || "Delete"}</ListItemText>
         </MenuItem>
       </Menu>
     </>

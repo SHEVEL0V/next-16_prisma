@@ -5,12 +5,22 @@ import { Box } from "@mui/material";
 import { formatDate } from "@/utils/format-date";
 import { TasksClient } from "./tasks-client";
 import type { TaskRow } from "./tasks-client";
+import { getDictionary, hasLocale } from "@/dictionaries";
+import { notFound } from "next/navigation";
+
+interface TasksProps {
+  params: Promise<{ lang: string }>;
+}
 
 /**
  * Tasks Page
  * Server component that fetches tasks and passes to client component
  */
-export default async function Tasks() {
+export default async function Tasks({ params }: TasksProps) {
+  const { lang } = await params;
+  if (!hasLocale(lang)) notFound();
+  const dict = await getDictionary(lang);
+
   const result = await getTasksAll();
   const tasks = result.data || [];
 
@@ -33,7 +43,7 @@ export default async function Tasks() {
         flexDirection: "column",
       }}
     >
-      <TasksClient rows={rows} />
+      <TasksClient rows={rows} dict={dict?.Tasks} />
     </Box>
   );
 }

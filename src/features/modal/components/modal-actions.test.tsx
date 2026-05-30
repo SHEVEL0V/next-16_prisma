@@ -20,7 +20,7 @@ jest.mock("@/components/ui/buttons", () => ({
     onClick?: () => void;
     disabled?: boolean;
     loading?: boolean;
-    type?: string;
+    type?: "button" | "submit" | "reset";
     form?: string;
     variant?: string;
   }) => (

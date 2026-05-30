@@ -4,17 +4,15 @@
 
 import { Box, Typography, Button, Container } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import type { Dict } from "@/types";
 
 interface ErrorBoundaryProps {
   error: Error & { digest?: string };
   reset: () => void;
+  dict?: Dict;
 }
 
-/**
- * Error Boundary Component
- * Displays error UI and provides recovery options
- */
-export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
+export default function ErrorBoundary({ error, reset, dict }: ErrorBoundaryProps) {
   return (
     <Container maxWidth="md">
       <Box
@@ -30,10 +28,10 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
       >
         <ErrorOutlineIcon sx={{ fontSize: 80, color: "error.main" }} />
         <Typography variant="h3" sx={{ fontWeight: 700 }}>
-          Oops! Something went wrong
+          {dict?.Common?.oops || "Oops!"}
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          {error.message || "An unexpected error occurred"}
+          {error.message || dict?.Common?.error || "Something went wrong"}
         </Typography>
         {process.env.NODE_ENV === "development" && error.digest && (
           <Typography variant="caption" color="text.secondary">
@@ -41,7 +39,7 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
           </Typography>
         )}
         <Button variant="contained" onClick={() => reset()}>
-          Try Again
+          {dict?.Common?.tryAgain || "Try Again"}
         </Button>
       </Box>
     </Container>

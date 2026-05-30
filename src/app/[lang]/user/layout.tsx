@@ -6,12 +6,26 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { getThemeCookie } from "@/utils/theme-cookie";
 import { DESIGN_TOKENS } from "@/theme/constants";
+import { getDictionary, hasLocale } from "@/dictionaries";
+import { notFound } from "next/navigation";
 
-export default async function ProfileLayout({ children }: { children: React.ReactNode }) {
+export default async function ProfileLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
   const mode = await getThemeCookie();
+
+  if (!hasLocale(lang)) notFound();
+
+  const dict = await getDictionary(lang);
+
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <Header mode={mode} />
+      <Header mode={mode} dict={dict} />
       <Box
         component="main"
         sx={{
@@ -24,7 +38,7 @@ export default async function ProfileLayout({ children }: { children: React.Reac
         {children}
       </Box>
 
-      <Footer />
+      <Footer dict={dict.Footer} />
     </div>
   );
 }

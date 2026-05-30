@@ -9,10 +9,12 @@ import TaskCard from "./task-card";
 import TaskCreateForm from "./task-form";
 import type { ColumnType, ColumnTaskType } from "../../types";
 import TitleColumn from "./column-title";
+import type { Dict } from "@/types";
 
 interface BoardColumnProps {
   column: ColumnType;
   boardId: string;
+  dict?: Dict;
 }
 
 /**
@@ -24,16 +26,21 @@ interface BoardColumnProps {
  * @param {ColumnType} column - Column data with nested tasks
  * @param {string} boardId - Parent board ID for task creation
  */
-export default memo(function BoardColumn({ column, boardId }: BoardColumnProps) {
+export default memo(function BoardColumn({ column, boardId, dict }: BoardColumnProps) {
   const theme = useTheme();
 
   return (
     <Paper variant="boardColumn" className="glass-effect bordered">
       {/* Column header with title and task count */}
-      <TitleColumn id={column.id} title={column.title} taskCount={column.tasks.length} />
+      <TitleColumn
+        id={column.id}
+        title={column.title}
+        taskCount={column.tasks.length}
+        dict={dict}
+      />
 
       {/* Task creation form */}
-      <TaskCreateForm columnId={column.id} boardId={boardId} />
+      <TaskCreateForm columnId={column.id} boardId={boardId} dict={dict} />
 
       {/* Droppable zone for drag-and-drop task reordering */}
       <Droppable droppableId={column.id} type="task">
@@ -51,7 +58,7 @@ export default memo(function BoardColumn({ column, boardId }: BoardColumnProps) 
           >
             {/* Task cards mapped from column tasks */}
             {column.tasks.map((task: ColumnTaskType, index: number) => (
-              <TaskCard key={task.id} task={task} index={index} />
+              <TaskCard key={task.id} task={task} index={index} dict={dict} />
             ))}
 
             {/* Drag-and-drop placeholder */}
@@ -69,7 +76,7 @@ export default memo(function BoardColumn({ column, boardId }: BoardColumnProps) 
                 }}
               >
                 <Typography variant="caption" color="text.secondary">
-                  No tasks
+                  {dict?.Board?.noTasks || "No tasks"}
                 </Typography>
               </Box>
             )}
