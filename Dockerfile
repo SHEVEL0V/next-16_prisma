@@ -54,7 +54,4 @@ RUN chmod +x ./entrypoint.sh
 # Google Cloud Run динамічно використовує порт 8080
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget -qO- http://localhost:${PORT:-8080}/api/health || exit 1
-
 ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
