@@ -11,7 +11,6 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../../generated/prisma/client";
 
-
 // const adapter = new PrismaMariaDb({
 //   host: process.env.MYSQL_HOST,
 //   user: process.env.MYSQL_USER,
