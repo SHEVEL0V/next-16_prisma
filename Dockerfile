@@ -1,22 +1,19 @@
 # ═══════════════════════════════════════════════════════════
-# Stage 1 — Dependencies
+# Stage 1 — Dependencies (Встановлюємо всі залежності для збірки)
 # ═══════════════════════════════════════════════════════════
 FROM node:24.1-alpine3.20 AS deps
-
 RUN apk add --no-cache libc6-compat
-
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev --ignore-scripts
+# Встановлюємо devDependencies для коректної перевірки типів TypeScript
+RUN npm ci --ignore-scripts
 
 # ═══════════════════════════════════════════════════════════
 # Stage 2 — Build
 # ═══════════════════════════════════════════════════════════
 FROM node:24.1-alpine3.20 AS builder
-
 WORKDIR /app
-
 ENV NODE_ENV=production
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -24,39 +21,40 @@ COPY . .
 
 COPY prisma ./prisma
 RUN npx prisma generate
-
 RUN npm run build
 
 # ═══════════════════════════════════════════════════════════
-# Stage 3 — Runner
-# Cloud Run: PORT задається платформою (default 8080)
+# Stage 3 — Runner (Мінімальний образ для продакшену)
 # ═══════════════════════════════════════════════════════════
 FROM node:24.1-alpine3.20 AS runner
-
 RUN apk add --no-cache tini wget
-
 WORKDIR /app
-
 ENV NODE_ENV=production
 
+# Створюємо користувача balu та групу nodejs
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser  --system --uid 1001 nextjs
+    adduser  --system --uid 1001 balu
 
-COPY --from=builder --chown=nextjs:nodejs /app/public          ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
+# Копіюємо асети та автономний сервер Next.js
+COPY --from=builder --chown=balu:nodejs /app/public          ./public
+COPY --from=builder --chown=balu:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=balu:nodejs /app/.next/static    ./.next/static
 
-COPY --from=builder --chown=nextjs:nodejs /app/prisma          ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/generated       ./generated
-COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma    ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma   ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+# Копіюємо файли конфігурації та схеми Prisma v7
+COPY --from=builder --chown=balu:nodejs /app/prisma          ./prisma
+COPY --from=builder --chown=balu:nodejs /app/generated       ./generated
+COPY --from=builder --chown=balu:nodejs /app/prisma.config.ts ./prisma.config.ts
 
-# entrypoint.sh — запускає міграцію, потім сервер
-COPY --chown=nextjs:nodejs entrypoint.sh ./entrypoint.sh
+# Копіюємо бінарники Prisma CLI для виконання міграцій у standalone режимі
+COPY --from=builder --chown=balu:nodejs /app/node_modules/prisma    ./node_modules/prisma
+COPY --from=builder --chown=balu:nodejs /app/node_modules/@prisma   ./node_modules/@prisma
+COPY --from=builder --chown=balu:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+
+# Налаштування скрипту ініціалізації
+COPY --chown=balu:nodejs entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
+# Перемикаємось на безпечного користувача
 USER balu
 
 EXPOSE 8080
