@@ -24,7 +24,6 @@ FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
-    PORT=3000 \
     HOSTNAME=0.0.0.0 \
     PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1
 
