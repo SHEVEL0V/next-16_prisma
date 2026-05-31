@@ -1,56 +1,67 @@
-# ─────────────────────────────────────────
-# Stage 1 — Install dependencies
-# ─────────────────────────────────────────
-FROM node:24-alpine AS deps
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+# ═══════════════════════════════════════════════════════════
+# Stage 1 — Dependencies
+# ═══════════════════════════════════════════════════════════
+FROM node:24.1-alpine3.20 AS deps
 
-# ─────────────────────────────────────────
-# Stage 2 — Build application
-# ─────────────────────────────────────────
-FROM node:24-alpine AS builder
+RUN apk add --no-cache libc6-compat
+
 WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev --ignore-scripts
+
+# ═══════════════════════════════════════════════════════════
+# Stage 2 — Build
+# ═══════════════════════════════════════════════════════════
+FROM node:24.1-alpine3.20 AS builder
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+COPY prisma ./prisma
 RUN npx prisma generate
+
 RUN npm run build
 
-# ─────────────────────────────────────────
-# Stage 3 — Minimal production runner
-# ─────────────────────────────────────────
-FROM node:24-alpine AS runner
+# ═══════════════════════════════════════════════════════════
+# Stage 3 — Runner
+# Cloud Run: PORT задається платформою (default 8080)
+# ═══════════════════════════════════════════════════════════
+FROM node:24.1-alpine3.20 AS runner
+
+RUN apk add --no-cache tini wget
+
 WORKDIR /app
 
-ENV NODE_ENV=production \
-    HOSTNAME=0.0.0.0 \
-    PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1
+ENV NODE_ENV=production
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser  --system --uid 1001 nextjs
 
-# Static assets
 COPY --from=builder --chown=nextjs:nodejs /app/public          ./public
-
-# Next.js standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
 
-# Prisma schema + конфіг v7
 COPY --from=builder --chown=nextjs:nodejs /app/prisma          ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/generated       ./generated
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
-
-# Prisma client і CLI
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma    ./node_modules/prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma   ./node_modules/@prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
-USER nextjs
-EXPOSE 3000
+# entrypoint.sh — запускає міграцію, потім сервер
+COPY --chown=nextjs:nodejs entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
-# ФІНАЛЬНА КОМАНДА ДЛЯ PRISMA V7 + NEXT.JS STANDALONE
-# 1. Тимчасово підміняємо DATABASE_URL на DIRECT_URL (порт 5432) суворо для міграції
-# 2. Якщо міграція успішна (&&), запускаємо автономний сервер Next.js
-CMD ["sh", "-c", "DATABASE_URL=$DIRECT_URL ./node_modules/.bin/prisma migrate deploy && node server.js"]
+USER balu
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -qO- http://localhost:${PORT:-8080}/api/health || exit 1
+
+ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]

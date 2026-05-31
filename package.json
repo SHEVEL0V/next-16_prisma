@@ -7,7 +7,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "prisma:migrate": "DATABASE_URL=$DIRECT_URL ./node_modules/.bin/prisma migrate deploy",
     "lint": "eslint",
     "test": "jest",
     "test:watch": "jest --watch",
