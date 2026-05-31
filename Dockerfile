@@ -47,11 +47,7 @@ COPY --from=builder /app/node_modules/prisma    ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma   ./node_modules/@prisma
 COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
-# Налаштування та копіювання скрипту запуску
-COPY entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
-
 # Google Cloud Run динамічно використовує порт 8080
 EXPOSE 8080
 
-ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
+CMD ["node", "server.js"]
