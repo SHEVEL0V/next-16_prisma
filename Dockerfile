@@ -28,6 +28,8 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0 \
     PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1
 
+RUN apk add --no-cache sh # Переконуємось, що оболонка доступна
+
 RUN addgroup --system --gid 1001 nodejs && \
     adduser  --system --uid 1001 nextjs
 
@@ -38,11 +40,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/public          ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
 
-# Prisma schema + compiled config (якщо prisma.config.ts → компілюється в build)
+# Prisma schema + конфіг v7
 COPY --from=builder --chown=nextjs:nodejs /app/prisma          ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/generated       ./generated
+COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 
-# Prisma client і CLI (без npx — явний шлях)
+# Prisma client і CLI
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma    ./node_modules/prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma   ./node_modules/@prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
@@ -50,4 +53,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_m
 USER nextjs
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+# ФІНАЛЬНА КОМАНДА ДЛЯ PRISMA V7 + NEXT.JS STANDALONE
+# 1. Тимчасово підміняємо DATABASE_URL на DIRECT_URL (порт 5432) суворо для міграції
+# 2. Якщо міграція успішна (&&), запускаємо автономний сервер Next.js
+CMD ["sh", "-c", "DATABASE_URL=$DIRECT_URL ./node_modules/.bin/prisma migrate deploy && node server.js"]
