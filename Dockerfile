@@ -28,8 +28,6 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0 \
     PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1
 
-RUN apk add --no-cache sh # Переконуємось, що оболонка доступна
-
 RUN addgroup --system --gid 1001 nodejs && \
     adduser  --system --uid 1001 nextjs
 
