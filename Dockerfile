@@ -1,16 +1,16 @@
 # ═══════════════════════════════════════════════════════════
-# Stage 1 — Dependencies (Встановлюємо всі залежності для збірки)
+# Stage 1 — Dependencies (Встановлення всіх пакетів для збірки)
 # ═══════════════════════════════════════════════════════════
 FROM node:24.1-alpine3.20 AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package*.json ./
-# Встановлюємо devDependencies для коректної перевірки типів TypeScript
+# Встановлюємо devDependencies для успішної перевірки типів TypeScript
 RUN npm ci --ignore-scripts
 
 # ═══════════════════════════════════════════════════════════
-# Stage 2 — Build
+# Stage 2 — Build (Компіляція застосунку та генерація клієнта)
 # ═══════════════════════════════════════════════════════════
 FROM node:24.1-alpine3.20 AS builder
 WORKDIR /app
@@ -24,39 +24,34 @@ RUN npx prisma generate
 RUN npm run build
 
 # ═══════════════════════════════════════════════════════════
-# Stage 3 — Runner (Мінімальний образ для продакшену)
+# Stage 3 — Runner (Мінімальний образ для Google Cloud Run)
 # ═══════════════════════════════════════════════════════════
 FROM node:24.1-alpine3.20 AS runner
 RUN apk add --no-cache tini wget
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Створюємо користувача balu та групу nodejs
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser  --system --uid 1001 balu
 
-# Копіюємо асети та автономний сервер Next.js
-COPY --from=builder --chown=balu:nodejs /app/public          ./public
-COPY --from=builder --chown=balu:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=balu:nodejs /app/.next/static    ./.next/static
+# Копіюємо статичні асети та автономну збірку Next.js
+COPY --from=builder /app/public          ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static    ./.next/static
 
-# Копіюємо файли конфігурації та схеми Prisma v7
-COPY --from=builder --chown=balu:nodejs /app/prisma          ./prisma
-COPY --from=builder --chown=balu:nodejs /app/generated       ./generated
-COPY --from=builder --chown=balu:nodejs /app/prisma.config.ts ./prisma.config.ts
+# Копіюємо конфігурацію та схему Prisma v7
+COPY --from=builder /app/prisma          ./prisma
+COPY --from=builder /app/generated       ./generated
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
-# Копіюємо бінарники Prisma CLI для виконання міграцій у standalone режимі
-COPY --from=builder --chown=balu:nodejs /app/node_modules/prisma    ./node_modules/prisma
-COPY --from=builder --chown=balu:nodejs /app/node_modules/@prisma   ./node_modules/@prisma
-COPY --from=builder --chown=balu:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+# Копіюємо бінарники CLI для виконання міграцій перед стартом
+COPY --from=builder /app/node_modules/prisma    ./node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma   ./node_modules/@prisma
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
-# Налаштування скрипту ініціалізації
-COPY --chown=balu:nodejs entrypoint.sh ./entrypoint.sh
+# Налаштування та копіювання скрипту запуску
+COPY entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
-# Перемикаємось на безпечного користувача
-USER balu
-
+# Google Cloud Run динамічно використовує порт 8080
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
