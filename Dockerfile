@@ -20,7 +20,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 COPY prisma ./prisma
-RUN npx prisma generate
 RUN npm run build
 
 # ═══════════════════════════════════════════════════════════
@@ -39,15 +38,15 @@ COPY --from=builder /app/.next/static    ./.next/static
 
 # Копіюємо конфігурацію та схему Prisma v7
 COPY --from=builder /app/prisma          ./prisma
-COPY --from=builder /app/generated       ./generated
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 # Копіюємо бінарники CLI для виконання міграцій перед стартом
 COPY --from=builder /app/node_modules/prisma    ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma   ./node_modules/@prisma
 COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+COPY --from=builder /app/node_modules/typescript ./node_modules/typescript
 
 # Google Cloud Run динамічно використовує порт 8080
 EXPOSE 8080
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && node server.js"]
