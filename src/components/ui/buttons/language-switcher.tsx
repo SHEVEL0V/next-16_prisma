@@ -28,7 +28,9 @@ export default function LanguageSwitcher({ dict }: { dict?: Dict }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <Tooltip title={languageDict?.selectLanguage || "Select Language"}>
-        <LanguageIcon fontSize="small" />
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <LanguageIcon fontSize="small" />
+        </Box>
       </Tooltip>
       <FormControl variant="standard" size="small">
         <Select
@@ -36,7 +38,15 @@ export default function LanguageSwitcher({ dict }: { dict?: Dict }) {
           onChange={handleLanguageChange}
           disabled={isPending}
           disableUnderline
-          sx={{ fontSize: "0.875rem", fontWeight: 500 }}
+          sx={{
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            "& .MuiSelect-select": {
+              display: "flex",
+              alignItems: "center",
+              py: 0,
+            },
+          }}
         >
           <MenuItem value="en">{languageDict?.en || "English"}</MenuItem>
           <MenuItem value="uk">{languageDict?.uk || "Українська"}</MenuItem>
