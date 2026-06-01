@@ -92,8 +92,4 @@ EXPOSE 8080
 # tini як entrypoint — коректно форвардить сигнали до node
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Послідовність старту:
-#   1. prisma generate  — регенерує client під поточний Alpine runtime
-#   2. prisma migrate deploy — застосовує нові міграції (idempotent, безпечно)
-#   3. node server.js   — запускає Next.js standalone на $PORT
-CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && node server.js"]
+CMD ["node", "server.js"]
