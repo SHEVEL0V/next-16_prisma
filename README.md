@@ -4,7 +4,7 @@ A modern, full-stack Kanban board built with **Next.js 16**, **React 19**, **Typ
 
 ## 🌐 Live Demo
 
-**[https://board](https://board-808925023135.europe-west1.run.app)**
+**[https://board-808925023135.europe-west1.run.app](https://board-808925023135.europe-west1.run.app)**
 
 > Hosted on Render (free tier — first load may take ~30s to wake up)
 
@@ -192,5 +192,5 @@ This project is private and not for public distribution.
 
 **Version**: 0.1.1
 **Repository**: [SHEVEL0V/next-16_prisma](https://github.com/SHEVEL0V/next-16_prisma)
-**Live**: [kanban-cuec.onrender.com](https://kanban-cuec.onrender.com)
-**Last Updated**: 2026-05-15
+**Live**: [board-808925023135.europe-west1.run.app](https://board-808925023135.europe-west1.run.app)
+**Last Updated**: 2026-06-01
