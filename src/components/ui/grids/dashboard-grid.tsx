@@ -1,7 +1,6 @@
 /** @format */
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Grid, Typography, CardActionArea, Box, Card } from "@mui/material";
 
 interface MenuItem {
