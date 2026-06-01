@@ -4,7 +4,7 @@ A modern, full-stack Kanban board built with **Next.js 16**, **React 19**, **Typ
 
 ## 🌐 Live Demo
 
-**[https://kanban-cuec.onrender.com](https://kanban-cuec.onrender.com)**
+**[https://board](https://board-808925023135.europe-west1.run.app)**
 
 > Hosted on Render (free tier — first load may take ~30s to wake up)
 
