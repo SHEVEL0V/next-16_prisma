@@ -34,9 +34,6 @@ COPY . .
 COPY prisma ./prisma
 
 ENV NODE_ENV=production
-# DATABASE_URL потрібен лише для prisma generate (schema validation),
-# реальне підключення відбувається під час migrate deploy при старті
-ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 
 # Генеруємо Prisma Client під Alpine (linux-musl бінарник)
 RUN npx prisma generate
@@ -76,14 +73,15 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma          ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 
-# ── Prisma CLI + runtime (потрібні для migrate deploy) ────
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma      ./node_modules/.prisma
+# ── Prisma CLI (потрібні для migrate deploy при старті) ───
+# Prisma 7+ НЕ використовує node_modules/.prisma —
+# client генерується у ./generated/prisma (згідно prisma.config.ts)
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma       ./node_modules/prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma      ./node_modules/@prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma  ./node_modules/.bin/prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/typescript   ./node_modules/typescript
 
-# ── generated Prisma Client (результат prisma generate) ──
+# ── Згенерований Prisma Client (Prisma 7: ./generated/prisma) ──
 COPY --from=builder --chown=nextjs:nodejs /app/generated ./generated
 
 USER nextjs
