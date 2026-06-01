@@ -98,24 +98,22 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 src/
 ├── app/                    # Next.js pages and layouts (App Router)
-├── components/             # Shared UI components (kebab-case)
-│   ├── layout/             # header, footer, mui-theme-provider
-│   └── ui/                 # buttons, modals, fields, grids, editor
-├── features/               # Feature modules
-│   ├── auth/               # Login, register, JWT sessions
-│   ├── board/              # Board, columns, tasks (drag-and-drop)
-│   ├── form/               # Form helpers
-│   ├── modal/              # Modal navigation hooks
-│   └── user/               # User profile
+├── components/             # Shared UI components
+├── constants/              # Application-wide constants
+├── dictionaries/           # Localization dictionaries
+├── features/               # Feature-based modules
 ├── hooks/                  # Shared React hooks
-├── lib/                    # Prisma client
-├── utils/                  # Session, validation, wrappers
-└── types/                  # Global TypeScript types
+├── lib/                    # Client libraries (Prisma, etc.)
+├── theme/                  # Material-UI theme configuration
+├── types/                  # Global TypeScript types
+├── utils/                  # Helper utilities
+└── proxy.ts                # Proxy configuration
 
 prisma/
-├── schema.prisma           # Generator config + datasource
-├── auth.prisma             # User, Profile models
-├── board.prisma            # Board, Column, Task models
+├── models/                 # Split Prisma model files
+│   ├── auth.prisma
+│   └── board.prisma
+├── schema.prisma           # Main schema configuration
 └── migrations/             # SQL migration history
 ```
 
