@@ -13,16 +13,32 @@ import type { Dict } from "@/types";
  * CreateBoardForm Component
  * Form for creating a new board with inline title input and add button
  */
-export default function CreateBoardForm({ isOpen, dict }: { isOpen: boolean; dict?: Dict }) {
+export default function CreateBoardForm({
+  isOpen,
+  onOpenSidebarAction,
+  dict,
+}: {
+  isOpen: boolean;
+  onOpenSidebarAction: () => void;
+  dict?: Dict;
+}) {
   const [state, formAction, isPending] = useActionState(createBoardAction, {
     success: false,
     errors: {},
   });
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    if (!isOpen) {
+      event.preventDefault();
+      onOpenSidebarAction();
+    }
+  };
+
   return (
     <Box sx={{ p: 2 }}>
       <form
         action={formAction}
+        onSubmit={handleSubmit}
         style={{
           display: "flex",
           alignItems: "center",

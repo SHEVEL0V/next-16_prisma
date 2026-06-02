@@ -22,6 +22,7 @@ type SidebarProps = {
 export default function Sidebar({ boards, activeBoard, dict }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const toggleSidebar = () => setIsOpen((prev) => !prev);
+  const openSidebar = () => setIsOpen(true);
 
   return (
     <Box
@@ -70,7 +71,7 @@ export default function Sidebar({ boards, activeBoard, dict }: SidebarProps) {
       </List>
 
       <Divider />
-      <CreateBoardForm isOpen={isOpen} dict={dict} />
+      <CreateBoardForm isOpen={isOpen} onOpenSidebarAction={openSidebar} dict={dict} />
     </Box>
   );
 }
