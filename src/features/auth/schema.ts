@@ -16,9 +16,9 @@ export interface RegisterInputT extends RegisterInput {
 
 /**
  * Name validation
- * Minimum 4 characters, whitespace trimmed
+ * Minimum 3 characters, whitespace trimmed
  */
-const name = z.string().trim().min(4, "Name is too short");
+const name = z.string().trim().min(3, "Name is too short");
 
 /**
  * Email validation
