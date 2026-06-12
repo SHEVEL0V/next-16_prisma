@@ -167,9 +167,31 @@ export function createSafeAction<TInput, TOutput>(
           );
         }
 
+        // Provide field-specific error messages for common constraints
+        let fieldError = "Record with this data already exists";
+        if (dbError.message.includes("email")) {
+          fieldError = "This email is already registered";
+        }
+
         return {
           success: false,
-          message: "Record with this data already exists",
+          message: fieldError,
+          errors: {},
+        };
+      }
+
+      // Handle application-level validation errors (from services)
+      if (error instanceof Error && error.message.includes("email")) {
+        if (isDev) {
+          console.warn(`[ACTION_VALIDATION] [${actionCtx}] Email validation error:`, {
+            input: inputData,
+            errorMessage: error.message,
+          });
+        }
+
+        return {
+          success: false,
+          message: error.message,
           errors: {},
         };
       }
