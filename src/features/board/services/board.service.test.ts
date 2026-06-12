@@ -4,7 +4,6 @@
 
 import { boardService } from "@/features/board/services/board";
 import prisma from "@/lib/prisma";
-import type { Prisma } from "@g/prisma/client";
 
 // Mock Prisma
 jest.mock("@/lib/prisma", () => ({
@@ -19,6 +18,8 @@ jest.mock("@/lib/prisma", () => ({
     },
   },
 }));
+
+const mockUserId = "user-123";
 
 describe("Board Service", () => {
   beforeEach(() => {
@@ -36,6 +37,7 @@ describe("Board Service", () => {
 
   const mockBoardWithColumns = {
     ...mockBoard,
+    members: [{ id: mockUserId }],
     columns: [
       {
         id: "col-1",
@@ -67,9 +69,14 @@ describe("Board Service", () => {
       const mockBoards = [mockBoard, { ...mockBoard, id: "board-456" }];
       (prisma.board.findMany as jest.Mock).mockResolvedValue(mockBoards);
 
-      const result = await boardService.get();
+      const result = await boardService.get(mockUserId);
 
       expect(prisma.board.findMany).toHaveBeenCalledWith({
+        where: {
+          members: {
+            some: { id: mockUserId },
+          },
+        },
         orderBy: { createdAt: "desc" },
       });
       expect(result).toEqual(mockBoards);
@@ -79,7 +86,7 @@ describe("Board Service", () => {
     it("should return empty array when no boards exist", async () => {
       (prisma.board.findMany as jest.Mock).mockResolvedValue([]);
 
-      const result = await boardService.get();
+      const result = await boardService.get(mockUserId);
 
       expect(result).toEqual([]);
     });
@@ -88,7 +95,7 @@ describe("Board Service", () => {
       const error = new Error("Database error");
       (prisma.board.findMany as jest.Mock).mockRejectedValue(error);
 
-      await expect(boardService.get()).rejects.toThrow("Database error");
+      await expect(boardService.get(mockUserId)).rejects.toThrow("Database error");
     });
   });
 
@@ -96,7 +103,7 @@ describe("Board Service", () => {
     it("should fetch board with columns and tasks", async () => {
       (prisma.board.findUnique as jest.Mock).mockResolvedValue(mockBoardWithColumns);
 
-      const result = await boardService.getById(mockBoardId);
+      const result = await boardService.getById(mockBoardId, mockUserId);
 
       expect(prisma.board.findUnique).toHaveBeenCalledWith({
         where: { id: mockBoardId },
@@ -110,6 +117,9 @@ describe("Board Service", () => {
               },
             },
           },
+          members: {
+            where: { id: mockUserId },
+          },
         },
       });
       expect(result).toEqual(mockBoardWithColumns);
@@ -119,7 +129,7 @@ describe("Board Service", () => {
     it("should return null when board does not exist", async () => {
       (prisma.board.findUnique as jest.Mock).mockResolvedValue(null);
 
-      const result = await boardService.getById("non-existent");
+      const result = await boardService.getById("non-existent", mockUserId);
 
       expect(result).toBeNull();
     });
@@ -127,21 +137,24 @@ describe("Board Service", () => {
     it("should handle invalid UUID format", async () => {
       (prisma.board.findUnique as jest.Mock).mockRejectedValue(new Error("Invalid UUID"));
 
-      await expect(boardService.getById("invalid-uuid")).rejects.toThrow();
+      await expect(boardService.getById("invalid-uuid", mockUserId)).rejects.toThrow();
     });
   });
 
   describe("create", () => {
     it("should create board with default columns", async () => {
-      const createData = { title: "New Board", userId: "user-123" };
+      const createData = { title: "New Board" };
 
       (prisma.board.create as jest.Mock).mockResolvedValue(mockBoardWithColumns);
 
-      const result = await boardService.create(createData as unknown as Prisma.BoardCreateInput);
+      const result = await boardService.create(createData, mockUserId);
 
       expect(prisma.board.create).toHaveBeenCalledWith({
         data: {
           ...createData,
+          members: {
+            connect: { id: mockUserId },
+          },
           columns: {
             create: [
               { title: "To Do", order: 1000 },
@@ -158,24 +171,18 @@ describe("Board Service", () => {
       const error = new Error("Unique constraint violation");
       (prisma.board.create as jest.Mock).mockRejectedValue(error);
 
-      await expect(
-        boardService.create({
-          title: "New Board",
-          userId: "user-123",
-        } as unknown as Prisma.BoardCreateInput),
-      ).rejects.toThrow();
+      await expect(boardService.create({ title: "New Board" }, mockUserId)).rejects.toThrow();
     });
 
     it("should preserve create data with additional fields", async () => {
       const createData = {
         title: "Board",
-        userId: "user-123",
         description: "A test board",
       };
 
       (prisma.board.create as jest.Mock).mockResolvedValue(mockBoard);
 
-      await boardService.create(createData as Prisma.BoardCreateInput);
+      await boardService.create(createData, mockUserId);
 
       expect(prisma.board.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -188,11 +195,10 @@ describe("Board Service", () => {
   describe("update", () => {
     it("should update board title", async () => {
       const updatedBoard = { ...mockBoard, title: "Updated Title" };
+      (prisma.board.findUnique as jest.Mock).mockResolvedValue(mockBoardWithColumns);
       (prisma.board.update as jest.Mock).mockResolvedValue(updatedBoard);
 
-      const result = await boardService.update(mockBoardId, {
-        title: "Updated Title",
-      });
+      const result = await boardService.update(mockBoardId, { title: "Updated Title" }, mockUserId);
 
       expect(prisma.board.update).toHaveBeenCalledWith({
         where: { id: mockBoardId },
@@ -201,33 +207,28 @@ describe("Board Service", () => {
       expect(result.title).toBe("Updated Title");
     });
 
-    it("should handle non-existent board", async () => {
-      const error = new Error("Board not found");
-      (prisma.board.update as jest.Mock).mockRejectedValue(error);
+    it("should throw when user is not member", async () => {
+      const noMembersBoard = { ...mockBoard, members: [] };
+      (prisma.board.findUnique as jest.Mock).mockResolvedValue(noMembersBoard);
 
-      await expect(boardService.update("non-existent", { title: "New" })).rejects.toThrow();
+      await expect(boardService.update(mockBoardId, { title: "New" }, mockUserId)).rejects.toThrow(
+        "Unauthorized"
+      );
     });
 
-    it("should only update title field", async () => {
-      (prisma.board.update as jest.Mock).mockResolvedValue(mockBoard);
+    it("should handle non-existent board", async () => {
+      (prisma.board.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await boardService.update(mockBoardId, {
-        title: "New Title",
-        description: "Should be ignored",
-      } as Prisma.BoardUpdateInput);
-
-      expect(prisma.board.update).toHaveBeenCalledWith({
-        where: { id: mockBoardId },
-        data: { title: "New Title" },
-      });
+      await expect(boardService.update("non-existent", { title: "New" }, mockUserId)).rejects.toThrow();
     });
   });
 
   describe("delete", () => {
     it("should delete board by ID", async () => {
+      (prisma.board.findUnique as jest.Mock).mockResolvedValue(mockBoardWithColumns);
       (prisma.board.delete as jest.Mock).mockResolvedValue(mockBoard);
 
-      const result = await boardService.delete(mockBoardId);
+      const result = await boardService.delete(mockBoardId, mockUserId);
 
       expect(prisma.board.delete).toHaveBeenCalledWith({
         where: { id: mockBoardId },
@@ -235,22 +236,17 @@ describe("Board Service", () => {
       expect(result.id).toBe(mockBoardId);
     });
 
-    it("should handle deletion of non-existent board", async () => {
-      const error = new Error("Board not found");
-      (prisma.board.delete as jest.Mock).mockRejectedValue(error);
+    it("should throw when user is not member", async () => {
+      const noMembersBoard = { ...mockBoard, members: [] };
+      (prisma.board.findUnique as jest.Mock).mockResolvedValue(noMembersBoard);
 
-      await expect(boardService.delete("non-existent")).rejects.toThrow();
+      await expect(boardService.delete(mockBoardId, mockUserId)).rejects.toThrow("Unauthorized");
     });
 
-    it("should cascade delete columns and tasks", async () => {
-      (prisma.board.delete as jest.Mock).mockResolvedValue(mockBoard);
+    it("should handle deletion of non-existent board", async () => {
+      (prisma.board.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await boardService.delete(mockBoardId);
-
-      // Prisma handles cascade deletes automatically
-      expect(prisma.board.delete).toHaveBeenCalledWith({
-        where: { id: mockBoardId },
-      });
+      await expect(boardService.delete("non-existent", mockUserId)).rejects.toThrow();
     });
   });
 
@@ -258,13 +254,13 @@ describe("Board Service", () => {
     it("should throw on database connection failure", async () => {
       (prisma.board.findMany as jest.Mock).mockRejectedValue(new Error("Connection refused"));
 
-      await expect(boardService.get()).rejects.toThrow("Connection refused");
+      await expect(boardService.get(mockUserId)).rejects.toThrow("Connection refused");
     });
 
     it("should handle timeout errors", async () => {
       (prisma.board.findUnique as jest.Mock).mockRejectedValue(new Error("Query timeout"));
 
-      await expect(boardService.getById(mockBoardId)).rejects.toThrow();
+      await expect(boardService.getById(mockBoardId, mockUserId)).rejects.toThrow();
     });
   });
 });

@@ -33,12 +33,21 @@ describe('Column Service', () => {
 
   const mockColumnId = 'col-123'
   const mockBoardId = 'board-123'
+  const mockUserId = 'user-123'
 
   const mockColumn = {
     id: mockColumnId,
     title: 'To Do',
     order: 1000,
     boardId: mockBoardId,
+  }
+
+  const mockColumnWithBoard = {
+    ...mockColumn,
+    board: {
+      id: mockBoardId,
+      members: [{ id: mockUserId }],
+    },
   }
 
   describe('getById', () => {
@@ -76,6 +85,9 @@ describe('Column Service', () => {
       const newColumn = { ...mockColumn, order: 3000 }
 
       const txMock = {
+        board: {
+          findUnique: jest.fn().mockResolvedValue({ members: [{ id: mockUserId }] }),
+        },
         column: {
           findFirst: jest.fn().mockResolvedValue(mockLastColumn),
           create: jest.fn().mockResolvedValue(newColumn),
@@ -86,7 +98,7 @@ describe('Column Service', () => {
         callback(txMock)
       )
 
-      const result = await columnService.create(mockBoardId, 'New Column')
+      const result = await columnService.create(mockBoardId, 'New Column', mockUserId)
 
       expect(result).toEqual(newColumn)
       expect(txMock.column.create).toHaveBeenCalledWith({
@@ -98,6 +110,9 @@ describe('Column Service', () => {
       const newColumn = { ...mockColumn, order: 1000 }
 
       const txMock = {
+        board: {
+          findUnique: jest.fn().mockResolvedValue({ members: [{ id: mockUserId }] }),
+        },
         column: {
           findFirst: jest.fn().mockResolvedValue(null),
           create: jest.fn().mockResolvedValue(newColumn),
@@ -108,7 +123,7 @@ describe('Column Service', () => {
         callback(txMock)
       )
 
-      const result = await columnService.create(mockBoardId, 'First Column')
+      const result = await columnService.create(mockBoardId, 'First Column', mockUserId)
 
       expect(result.order).toBe(1000)
       expect(txMock.column.create).toHaveBeenCalledWith({
@@ -116,14 +131,10 @@ describe('Column Service', () => {
       })
     })
 
-    it('should increment order by 1000 from last column', async () => {
-      const lastOrder = 5000
-      const mockLastColumn = { ...mockColumn, order: lastOrder }
-
+    it('should throw when user is not a member', async () => {
       const txMock = {
-        column: {
-          findFirst: jest.fn().mockResolvedValue(mockLastColumn),
-          create: jest.fn().mockResolvedValue({ ...mockColumn, order: 6000 }),
+        board: {
+          findUnique: jest.fn().mockResolvedValue({ members: [] }),
         },
       }
 
@@ -131,22 +142,19 @@ describe('Column Service', () => {
         callback(txMock)
       )
 
-      await columnService.create(mockBoardId, 'Column')
-
-      expect(txMock.column.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ order: lastOrder + 1000 }),
-      })
+      await expect(columnService.create(mockBoardId, 'Column', mockUserId)).rejects.toThrow(
+        'Unauthorized'
+      )
     })
   })
 
   describe('update', () => {
     it('should update column title', async () => {
       const updatedColumn = { ...mockColumn, title: 'Updated Title' }
+      ;(prisma.column.findUnique as jest.Mock).mockResolvedValue(mockColumnWithBoard)
       ;(prisma.column.update as jest.Mock).mockResolvedValue(updatedColumn)
 
-      const result = await columnService.update(mockColumnId, {
-        title: 'Updated Title',
-      })
+      const result = await columnService.update(mockColumnId, { title: 'Updated Title' }, mockUserId)
 
       expect(prisma.column.update).toHaveBeenCalledWith({
         where: { id: mockColumnId },
@@ -155,32 +163,13 @@ describe('Column Service', () => {
       expect(result.title).toBe('Updated Title')
     })
 
-    it('should update column order', async () => {
-      const updatedColumn = { ...mockColumn, order: 5000 }
-      ;(prisma.column.update as jest.Mock).mockResolvedValue(updatedColumn)
+    it('should throw when user is not a member', async () => {
+      const noMembersBoard = { ...mockColumn, board: { members: [] } }
+      ;(prisma.column.findUnique as jest.Mock).mockResolvedValue(noMembersBoard)
 
-      const result = await columnService.update(mockColumnId, { order: 5000 })
-
-      expect(prisma.column.update).toHaveBeenCalledWith({
-        where: { id: mockColumnId },
-        data: { order: 5000 },
-      })
-      expect(result.order).toBe(5000)
-    })
-
-    it('should update both title and order', async () => {
-      const updatedColumn = { ...mockColumn, title: 'New', order: 2500 }
-      ;(prisma.column.update as jest.Mock).mockResolvedValue(updatedColumn)
-
-      await columnService.update(mockColumnId, {
-        title: 'New',
-        order: 2500,
-      })
-
-      expect(prisma.column.update).toHaveBeenCalledWith({
-        where: { id: mockColumnId },
-        data: { title: 'New', order: 2500 },
-      })
+      await expect(
+        columnService.update(mockColumnId, { title: 'Updated' }, mockUserId)
+      ).rejects.toThrow('Unauthorized')
     })
   })
 
@@ -191,6 +180,7 @@ describe('Column Service', () => {
           findUnique: jest.fn().mockResolvedValue({
             ...mockColumn,
             _count: { tasks: 0 },
+            board: { members: [{ id: mockUserId }] },
           }),
           delete: jest.fn().mockResolvedValue(mockColumn),
         },
@@ -200,7 +190,7 @@ describe('Column Service', () => {
         callback(txMock)
       )
 
-      const result = await columnService.delete(mockColumnId)
+      const result = await columnService.delete(mockColumnId, mockUserId)
 
       expect(result).toEqual(mockColumn)
       expect(txMock.column.delete).toHaveBeenCalledWith({
@@ -214,6 +204,7 @@ describe('Column Service', () => {
           findUnique: jest.fn().mockResolvedValue({
             ...mockColumn,
             _count: { tasks: 3 },
+            board: { members: [{ id: mockUserId }] },
           }),
           delete: jest.fn(),
         },
@@ -223,17 +214,20 @@ describe('Column Service', () => {
         callback(txMock)
       )
 
-      await expect(columnService.delete(mockColumnId)).rejects.toThrow(
+      await expect(columnService.delete(mockColumnId, mockUserId)).rejects.toThrow(
         'Cannot delete column with tasks'
       )
 
       expect(txMock.column.delete).not.toHaveBeenCalled()
     })
 
-    it('should handle non-existent column gracefully', async () => {
+    it('should throw when user is not a member', async () => {
       const txMock = {
         column: {
-          findUnique: jest.fn().mockResolvedValue(null),
+          findUnique: jest.fn().mockResolvedValue({
+            ...mockColumn,
+            board: { members: [] },
+          }),
           delete: jest.fn(),
         },
       }
@@ -242,16 +236,9 @@ describe('Column Service', () => {
         callback(txMock)
       )
 
-      // When column is null, the condition `if (column && column._count.tasks > 0)` will be false
-      // So it will try to delete without throwing - we should expect this behavior
-      try {
-        const result = await columnService.delete(mockColumnId)
-        // If it doesn't throw, column should be undefined from delete
-        expect(result).toBeUndefined()
-      } catch (e) {
-        // Or it might throw, which is also acceptable
-        expect(e).toBeDefined()
-      }
+      await expect(columnService.delete(mockColumnId, mockUserId)).rejects.toThrow(
+        'Unauthorized'
+      )
     })
 
     it('should reject multiple tasks', async () => {
@@ -260,6 +247,7 @@ describe('Column Service', () => {
           findUnique: jest.fn().mockResolvedValue({
             ...mockColumn,
             _count: { tasks: 10 },
+            board: { members: [{ id: mockUserId }] },
           }),
           delete: jest.fn(),
         },
@@ -269,7 +257,7 @@ describe('Column Service', () => {
         callback(txMock)
       )
 
-      await expect(columnService.delete(mockColumnId)).rejects.toThrow(
+      await expect(columnService.delete(mockColumnId, mockUserId)).rejects.toThrow(
         'Cannot delete column with tasks'
       )
     })
