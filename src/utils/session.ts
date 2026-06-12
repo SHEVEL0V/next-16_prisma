@@ -1,6 +1,6 @@
 /** @format */
+"use server";
 
-import "server-only";
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 import type { User } from "../../generated/prisma/client";

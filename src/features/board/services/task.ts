@@ -29,7 +29,7 @@ export const taskService = {
 		return await prisma.$transaction(async (tx) => {
 			// Verify user is member of board
 			const column = await tx.column.findUnique({
-				where: { columnId },
+				where: { id: columnId },
 				include: {
 					board: {
 						include: { members: { where: { id: userId } } },
@@ -146,6 +146,23 @@ export const taskService = {
 			data: {
 				order,
 				columnId,
+			},
+		});
+	},
+
+	/**
+	 * Get all tasks with full relationship data
+	 * Used for data export or analytics
+	 * @returns Array of tasks with nested column and board info
+	 */
+	getAllInfo: async () => {
+		return await prisma.task.findMany({
+			include: {
+				column: {
+					include: {
+						board: true,
+					},
+				},
 			},
 		});
 	},

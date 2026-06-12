@@ -22,7 +22,7 @@ export default async function Tasks({ params }: TasksProps) {
   const dict = await getDictionary(lang);
 
   const result = await getTasksAll();
-  const tasks = result.data || [];
+  const tasks = Array.isArray(result.data) ? result.data : [];
 
   const rows: TaskRow[] = tasks.map((task) => ({
     id: task.id,

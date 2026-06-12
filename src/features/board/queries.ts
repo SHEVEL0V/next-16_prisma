@@ -1,6 +1,5 @@
 /** @format */
-
-import "server-only";
+"use server";
 
 /**
  * Board Server Queries
