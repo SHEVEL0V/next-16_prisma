@@ -1,6 +1,6 @@
 /** @format */
-"use server";
 
+import "server-only";
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 import type { User } from "../../generated/prisma/client";
@@ -9,6 +9,9 @@ import type { User } from "../../generated/prisma/client";
  * Session Management Utilities
  * Handles JWT-based session encryption, decryption, and cookie management
  */
+
+// Session duration (1 hour in milliseconds)
+const SESSION_DURATION_MS = 60 * 60 * 1000;
 
 // Lazy-initialized encoded key — validated at call time, not at module load.
 // This prevents next build from failing when env vars are not available at build time.
@@ -45,7 +48,7 @@ export async function encrypt(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("7d")
+    .setExpirationTime("1h")
     .sign(getEncodedKey());
 }
 
@@ -77,8 +80,7 @@ export async function decrypt(session: string | undefined = "") {
  * @param user - User object with id and name
  */
 export async function createSession(user: User) {
-  const duration = 60 * 60 * 1000; // 1 hour in milliseconds
-  const expiresAt = Date.now() + duration;
+  const expiresAt = Date.now() + SESSION_DURATION_MS;
   const { id, name } = user;
 
   const session = await encrypt({
@@ -89,12 +91,11 @@ export async function createSession(user: User) {
 
   const cookieStore = await cookies();
 
-  // Set secure HTTP-only cookie with CSRF protection
   cookieStore.set("session", session, {
-    httpOnly: true, // Prevents client-side access
-    secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     expires: new Date(expiresAt),
-    sameSite: "lax", // CSRF protection
+    sameSite: "lax",
     path: "/",
   });
 }

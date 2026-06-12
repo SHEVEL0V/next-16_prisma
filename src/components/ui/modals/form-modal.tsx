@@ -15,6 +15,7 @@ import {
   IconButton,
   Alert,
   Box,
+  TextField,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useActionState } from "react";
@@ -209,22 +210,19 @@ export const FormModal = memo(
               {!children && fields.length > 0 && (
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   {fields.map((field) => (
-                    <Box key={field.name} sx={{ maxWidth: field.maxWidth || "100%" }}>
-                      <input
-                        type={field.type}
-                        name={field.name}
-                        placeholder={field.placeholder}
-                        required={field.required}
-                        defaultValue={field.defaultValue}
-                        style={{
-                          width: "100%",
-                          padding: "8px 12px",
-                          border: "1px solid #ccc",
-                          borderRadius: "4px",
-                          fontSize: "14px",
-                        }}
-                      />
-                    </Box>
+                    <TextField
+                      key={field.name}
+                      type={field.type}
+                      name={field.name}
+                      label={field.label}
+                      placeholder={field.placeholder}
+                      required={field.required}
+                      defaultValue={field.defaultValue}
+                      multiline={field.multiline}
+                      rows={field.rows}
+                      fullWidth
+                      size="small"
+                    />
                   ))}
                 </Box>
               )}

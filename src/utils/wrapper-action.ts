@@ -185,12 +185,12 @@ export function createSafeAction<TInput, TOutput>(
         });
       }
 
+      // Hide implementation details in production
+      const message = isDev && error instanceof Error ? error.message : "An error occurred during processing";
+
       return {
         success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred",
+        message,
         errors: {},
       };
     }

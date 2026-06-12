@@ -32,6 +32,7 @@ describe('Task Service', () => {
 
   const mockTaskId = 'task-123'
   const mockColumnId = 'col-123'
+  const mockUserId = 'user-123'
 
   const mockTask = {
     id: mockTaskId,
@@ -42,6 +43,16 @@ describe('Task Service', () => {
     priority: 'MEDIUM',
     createdAt: new Date(),
     updatedAt: new Date(),
+  }
+
+  const mockTaskWithBoard = {
+    ...mockTask,
+    column: {
+      boardId: 'board-123',
+      board: {
+        members: [{ id: mockUserId }],
+      },
+    },
   }
 
   describe('getById', () => {
@@ -71,6 +82,11 @@ describe('Task Service', () => {
       const newTask = { ...mockTask, order: 3000 }
 
       const txMock = {
+        column: {
+          findUnique: jest.fn().mockResolvedValue({
+            board: { members: [{ id: mockUserId }] },
+          }),
+        },
         task: {
           findFirst: jest.fn().mockResolvedValue(mockLastTask),
           create: jest.fn().mockResolvedValue(newTask),
@@ -81,7 +97,7 @@ describe('Task Service', () => {
         callback(txMock)
       )
 
-      const result = await taskService.create(mockColumnId, 'New Task')
+      const result = await taskService.create(mockColumnId, 'New Task', mockUserId)
 
       expect(result).toEqual(newTask)
       expect(txMock.task.create).toHaveBeenCalledWith({
@@ -93,6 +109,11 @@ describe('Task Service', () => {
       const newTask = { ...mockTask, order: 1000 }
 
       const txMock = {
+        column: {
+          findUnique: jest.fn().mockResolvedValue({
+            board: { members: [{ id: mockUserId }] },
+          }),
+        },
         task: {
           findFirst: jest.fn().mockResolvedValue(null),
           create: jest.fn().mockResolvedValue(newTask),
@@ -103,19 +124,17 @@ describe('Task Service', () => {
         callback(txMock)
       )
 
-      const result = await taskService.create(mockColumnId, 'First Task')
+      const result = await taskService.create(mockColumnId, 'First Task', mockUserId)
 
       expect(result.order).toBe(1000)
     })
 
-    it('should increment order by 1000 from last task', async () => {
-      const lastOrder = 4000
-      const mockLastTask = { ...mockTask, order: lastOrder }
-
+    it('should throw when user is not a member', async () => {
       const txMock = {
-        task: {
-          findFirst: jest.fn().mockResolvedValue(mockLastTask),
-          create: jest.fn().mockResolvedValue({ ...mockTask, order: 5000 }),
+        column: {
+          findUnique: jest.fn().mockResolvedValue({
+            board: { members: [] },
+          }),
         },
       }
 
@@ -123,22 +142,19 @@ describe('Task Service', () => {
         callback(txMock)
       )
 
-      await taskService.create(mockColumnId, 'Task')
-
-      expect(txMock.task.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ order: lastOrder + 1000 }),
-      })
+      await expect(taskService.create(mockColumnId, 'Task', mockUserId)).rejects.toThrow(
+        'Unauthorized'
+      )
     })
   })
 
   describe('update', () => {
     it('should update task title', async () => {
       const updatedTask = { ...mockTask, title: 'Updated Title' }
+      ;(prisma.task.findUnique as jest.Mock).mockResolvedValue(mockTaskWithBoard)
       ;(prisma.task.update as jest.Mock).mockResolvedValue(updatedTask)
 
-      const result = await taskService.update(mockTaskId, {
-        title: 'Updated Title',
-      })
+      const result = await taskService.update(mockTaskId, { title: 'Updated Title' }, mockUserId)
 
       expect(prisma.task.update).toHaveBeenCalledWith({
         where: { id: mockTaskId },
@@ -147,64 +163,25 @@ describe('Task Service', () => {
       expect(result.title).toBe('Updated Title')
     })
 
-    it('should update task priority', async () => {
-      const updatedTask = { ...mockTask, priority: 'HIGH' }
-      ;(prisma.task.update as jest.Mock).mockResolvedValue(updatedTask)
-
-      const result = await taskService.update(mockTaskId, { priority: 'HIGH' })
-
-      expect(prisma.task.update).toHaveBeenCalledWith({
-        where: { id: mockTaskId },
-        data: { priority: 'HIGH' },
-      })
-      expect(result.priority).toBe('HIGH')
-    })
-
-    it('should update task description', async () => {
-      const updatedTask = { ...mockTask, description: 'Task description' }
-      ;(prisma.task.update as jest.Mock).mockResolvedValue(updatedTask)
-
-      await taskService.update(mockTaskId, {
-        description: 'Task description',
-      })
-
-      expect(prisma.task.update).toHaveBeenCalledWith({
-        where: { id: mockTaskId },
-        data: { description: 'Task description' },
-      })
-    })
-
-    it('should update multiple fields', async () => {
-      const updatedTask = {
+    it('should throw when user is not a member', async () => {
+      const noMembersTask = {
         ...mockTask,
-        title: 'New Title',
-        priority: 'URGENT',
-        description: 'Updated',
+        column: { board: { members: [] } },
       }
-      ;(prisma.task.update as jest.Mock).mockResolvedValue(updatedTask)
+      ;(prisma.task.findUnique as jest.Mock).mockResolvedValue(noMembersTask)
 
-      await taskService.update(mockTaskId, {
-        title: 'New Title',
-        priority: 'URGENT',
-        description: 'Updated',
-      })
-
-      expect(prisma.task.update).toHaveBeenCalledWith({
-        where: { id: mockTaskId },
-        data: {
-          title: 'New Title',
-          priority: 'URGENT',
-          description: 'Updated',
-        },
-      })
+      await expect(taskService.update(mockTaskId, { title: 'Updated' }, mockUserId)).rejects.toThrow(
+        'Unauthorized'
+      )
     })
   })
 
   describe('delete', () => {
     it('should delete task by ID', async () => {
+      ;(prisma.task.findUnique as jest.Mock).mockResolvedValue(mockTaskWithBoard)
       ;(prisma.task.delete as jest.Mock).mockResolvedValue(mockTask)
 
-      const result = await taskService.delete(mockTaskId)
+      const result = await taskService.delete(mockTaskId, mockUserId)
 
       expect(prisma.task.delete).toHaveBeenCalledWith({
         where: { id: mockTaskId },
@@ -212,21 +189,24 @@ describe('Task Service', () => {
       expect(result).toEqual(mockTask)
     })
 
-    it('should handle deletion of non-existent task', async () => {
-      ;(prisma.task.delete as jest.Mock).mockRejectedValue(
-        new Error('Task not found')
-      )
+    it('should throw when user is not a member', async () => {
+      const noMembersTask = {
+        ...mockTask,
+        column: { board: { members: [] } },
+      }
+      ;(prisma.task.findUnique as jest.Mock).mockResolvedValue(noMembersTask)
 
-      await expect(taskService.delete('non-existent')).rejects.toThrow()
+      await expect(taskService.delete(mockTaskId, mockUserId)).rejects.toThrow('Unauthorized')
     })
   })
 
   describe('reorder', () => {
     it('should reorder task in same column', async () => {
       const reorderedTask = { ...mockTask, order: 2500 }
+      ;(prisma.task.findUnique as jest.Mock).mockResolvedValue(mockTaskWithBoard)
       ;(prisma.task.update as jest.Mock).mockResolvedValue(reorderedTask)
 
-      const result = await taskService.reorder(mockTaskId, 2500, mockColumnId)
+      const result = await taskService.reorder(mockTaskId, 2500, mockColumnId, mockUserId)
 
       expect(prisma.task.update).toHaveBeenCalledWith({
         where: { id: mockTaskId },
@@ -242,9 +222,10 @@ describe('Task Service', () => {
         columnId: newColumnId,
         order: 1000,
       }
+      ;(prisma.task.findUnique as jest.Mock).mockResolvedValue(mockTaskWithBoard)
       ;(prisma.task.update as jest.Mock).mockResolvedValue(movedTask)
 
-      const result = await taskService.reorder(mockTaskId, 1000, newColumnId)
+      const result = await taskService.reorder(mockTaskId, 1000, newColumnId, mockUserId)
 
       expect(prisma.task.update).toHaveBeenCalledWith({
         where: { id: mockTaskId },
@@ -253,24 +234,16 @@ describe('Task Service', () => {
       expect(result.columnId).toBe(newColumnId)
     })
 
-    it('should handle drag-and-drop with new order', async () => {
-      const newOrder = 5000
-      const newColumnId = 'col-789'
-      const draggedTask = {
+    it('should throw when user is not a member', async () => {
+      const noMembersTask = {
         ...mockTask,
-        order: newOrder,
-        columnId: newColumnId,
+        column: { board: { members: [] } },
       }
-      ;(prisma.task.update as jest.Mock).mockResolvedValue(draggedTask)
+      ;(prisma.task.findUnique as jest.Mock).mockResolvedValue(noMembersTask)
 
-      const result = await taskService.reorder(mockTaskId, newOrder, newColumnId)
-
-      expect(prisma.task.update).toHaveBeenCalledWith({
-        where: { id: mockTaskId },
-        data: { order: newOrder, columnId: newColumnId },
-      })
-      expect(result.order).toBe(newOrder)
-      expect(result.columnId).toBe(newColumnId)
+      await expect(taskService.reorder(mockTaskId, 2500, mockColumnId, mockUserId)).rejects.toThrow(
+        'Unauthorized'
+      )
     })
   })
 

@@ -18,9 +18,9 @@ function getLocale(req: NextRequest): Locale {
   return DEFAULT_LOCALE;
 }
 
-// Routes that require no session
+// Routes that require authentication
 const PROTECTED_ROUTES = new Set(["/user", "/"]);
-// Routes that redirect authenticated users away
+// Routes that redirect authenticated users to dashboard
 const PUBLIC_ROUTES = new Set(["/signin", "/signup"]);
 
 function isProtected(path: string) {
